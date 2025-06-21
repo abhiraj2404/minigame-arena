@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getCurrentTournament, addEntryFee } from "@/app/api/lib/tournament-system"
+import { getCurrentTournament, addEntryFee } from "@/lib/tournament-system"
 
 export async function POST(request: Request) {
   try {

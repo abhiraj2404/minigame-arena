@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getCurrentTournament, getTournamentStatus } from "@/app/api/lib/tournament-system"
+import { getCurrentTournament, getTournamentStatus } from "@/lib/tournament-system"
 
 export async function GET(request: Request) {
   try {

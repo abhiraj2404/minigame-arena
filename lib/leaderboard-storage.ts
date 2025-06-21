@@ -1,11 +1,4 @@
-interface LeaderboardEntry {
-  id: string;
-  playerName: string;
-  walletAddress?: string; // Add wallet address field
-  score: number;
-  timestamp: number;
-  game: string;
-}
+import type { LeaderboardEntry } from "@/lib/types";
 
 // Shared leaderboard storage (in production, use a database)
 let globalLeaderboard: LeaderboardEntry[] = [

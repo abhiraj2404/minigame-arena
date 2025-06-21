@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { addScore } from "@/app/api/lib/leaderboard-storage"
+import { addScore } from "@/lib/leaderboard-storage"
 
 export async function POST(request: Request) {
   try {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getLeaderboard } from "@/app/api/lib/leaderboard-storage"
+import { getLeaderboard } from "@/lib/leaderboard-storage"
 
 export async function GET() {
   try {

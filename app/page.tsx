@@ -1,5 +1,8 @@
-import AnimatedGradientText from "@/components/magicui/animated-gradient-text"
-import GameCard from "./components/game-card"
+"use client";
+
+import AnimatedGradientText from "@/components/magicui/animated-gradient-text";
+import GameCard from "../components/game-card";
+import { GAME_FEES } from "@/lib/constants";
 
 const games = [
   {
@@ -9,7 +12,7 @@ const games = [
       "Classic mine detection game with modern multiplayer features and SOL rewards. Test your logic and luck!",
     icon: "💣",
     status: "available" as const,
-    cost: "0.1 SOL",
+    cost: `${GAME_FEES.minesweeper} SOL`,
     tags: ["Logic", "Strategy", "Classic"],
     preview: (
       <div className="grid grid-cols-6 gap-1 p-4">
@@ -18,7 +21,11 @@ const games = [
             key={i}
             className="w-4 h-4 bg-gray-700 border border-gray-600 rounded-sm flex items-center justify-center text-xs"
           >
-            {Math.random() > 0.8 ? "💣" : Math.random() > 0.6 ? Math.floor(Math.random() * 4) + 1 : ""}
+            {Math.random() > 0.8
+              ? "💣"
+              : Math.random() > 0.6
+              ? Math.floor(Math.random() * 4) + 1
+              : ""}
           </div>
         ))}
       </div>
@@ -28,10 +35,10 @@ const games = [
     id: "tetris",
     title: "Tetris",
     description:
-      "Stack blocks and clear lines in this timeless puzzle game with competitive multiplayer modes and tournaments.",
+      "Stack blocks and clear lines in this timeless puzzle game with competitive tournaments.",
     icon: "🧩",
     status: "available" as const, // Change from "coming-soon" to "available"
-    cost: "0.15 SOL",
+    cost: `${GAME_FEES.tetris} SOL`,
     tags: ["Puzzle", "Speed", "Multiplayer"],
     preview: (
       <div className="grid grid-cols-10 gap-px p-4">
@@ -40,9 +47,13 @@ const games = [
             key={i}
             className={`w-3 h-3 rounded-sm ${
               Math.random() > 0.7
-                ? ["bg-blue-500", "bg-green-500", "bg-red-500", "bg-yellow-500", "bg-purple-500"][
-                    Math.floor(Math.random() * 5)
-                  ]
+                ? [
+                    "bg-blue-500",
+                    "bg-green-500",
+                    "bg-red-500",
+                    "bg-yellow-500",
+                    "bg-purple-500",
+                  ][Math.floor(Math.random() * 5)]
                 : "bg-gray-800"
             }`}
           />
@@ -57,7 +68,7 @@ const games = [
       "Grow your snake and avoid the walls in this classic arcade game with modern twists and crypto rewards.",
     icon: "🐍",
     status: "available" as const,
-    cost: "0.08 SOL",
+    cost: `${GAME_FEES.snake} SOL`,
     tags: ["Arcade", "Survival", "Classic"],
     preview: (
       <div className="relative w-full h-full bg-gray-800 rounded-lg p-4">
@@ -70,7 +81,7 @@ const games = [
       </div>
     ),
   },
-]
+];
 
 export default function HomePage() {
   return (
@@ -88,8 +99,8 @@ export default function HomePage() {
         </h1>
 
         <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-          Challenge yourself with classic games, compete with players worldwide, and win SOL rewards in our
-          decentralized gaming platform.
+          Challenge yourself with classic games, compete with players worldwide,
+          and win SOL rewards in our decentralized gaming platform.
         </p>
       </div>
 
@@ -110,25 +121,31 @@ export default function HomePage() {
                 <span className="text-2xl">💰</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Pay to Play</h3>
-              <p className="text-gray-400">Use SOL to enter games and tournaments</p>
+              <p className="text-gray-400">
+                Use SOL to enter games and tournaments
+              </p>
             </div>
             <div className="space-y-4">
               <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto">
                 <span className="text-2xl">🎯</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Compete</h3>
-              <p className="text-gray-400">Challenge players from around the world</p>
+              <p className="text-gray-400">
+                Challenge players from around the world
+              </p>
             </div>
             <div className="space-y-4">
               <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto">
                 <span className="text-2xl">🏆</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Win Rewards</h3>
-              <p className="text-gray-400">Earn SOL for victories and achievements</p>
+              <p className="text-gray-400">
+                Earn SOL for victories and achievements
+              </p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

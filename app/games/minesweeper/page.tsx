@@ -7,6 +7,8 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import GamePayment from "@/components/game-payment";
 import { formatSol } from "@/lib/solana-config";
+import type { LeaderboardEntry, Tournament } from "@/lib/types";
+import { generatePlayerName } from "@/lib/utils";
 
 interface Cell {
   isMine: boolean;
@@ -17,29 +19,9 @@ interface Cell {
   col: number;
 }
 
-interface LeaderboardEntry {
-  id: string;
-  playerName: string;
-  walletAddress?: string;
-  score: number;
-  timestamp: number;
-  game: string;
-}
-
-interface Tournament {
-  id: string;
-  game: string;
-  publicKey: string;
-  prizePool: number;
-  entryFee: number;
-  participants: number;
-  status: string;
-  endDate: number; // Change from endsAt to endDate
-}
-
 interface GameState {
   board: Cell[][];
-  gameStatus: "waiting" | "playing" | "won" | "lost";
+  gameStatus: "waiting" | "ready" | "playing" | "won" | "lost";
   minesRemaining: number;
   playerName: string;
   totalWins: number;
@@ -48,39 +30,6 @@ interface GameState {
 
 const BOARD_SIZE = 9;
 const TOTAL_MINES = 10;
-
-// Generate random player names
-const ADJECTIVES = [
-  "Swift",
-  "Clever",
-  "Sharp",
-  "Quick",
-  "Smart",
-  "Bold",
-  "Wise",
-  "Safe",
-  "Lucky",
-  "Expert",
-];
-const NOUNS = [
-  "Defuser",
-  "Hunter",
-  "Clicker",
-  "Sweeper",
-  "Detective",
-  "Master",
-  "Solver",
-  "Finder",
-  "Clearer",
-  "Hero",
-];
-
-const generatePlayerName = () => {
-  const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
-  const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
-  const number = Math.floor(Math.random() * 999) + 1;
-  return `${adjective}${noun}${number}`;
-};
 
 const formatWalletAddress = (address?: string) => {
   if (!address) return "";
@@ -107,7 +56,8 @@ export default function MinesweeperPage() {
   const tournamentUpdateRef = useRef<NodeJS.Timeout>();
 
   const { publicKey } = useWallet();
-  const [showPayment, setShowPayment] = useState(false);
+  const [showPayment, setShowPayment] = useState(true);
+  const [showStartGameButton, setShowStartGameButton] = useState(false);
 
   // Load tournament data
   const loadTournament = async (showLoading = false) => {
@@ -205,24 +155,24 @@ export default function MinesweeperPage() {
 
   // Handle payment success
   const handlePaymentSuccess = () => {
+    setMessage("Payment successful! You can now start the game.");
+    setShowStartGameButton(true);
     setShowPayment(false);
-    startNewGame();
-    setMessage("Payment successful! Game started.");
-    loadTournament();
+    setGameState((gamestate) => ({
+      ...gamestate,
+      gameStatus: "ready",
+    }));
+  };
+
+  const handleStartGameButton = () => {
+    loadTournament(true);
+    startGame();
+    setShowStartGameButton(false);
   };
 
   // Handle payment error
   const handlePaymentError = (errorMessage: string) => {
     setError(errorMessage);
-  };
-
-  // Start new game (now requires payment)
-  const initiateGame = () => {
-    if (!publicKey) {
-      setError("Please connect your wallet to play");
-      return;
-    }
-    setShowPayment(true);
   };
 
   // Generate empty board
@@ -360,7 +310,7 @@ export default function MinesweeperPage() {
   };
 
   // Start new game
-  const startNewGame = () => {
+  const startGame = () => {
     const newPlayerName = generatePlayerName();
     setGameState({
       board: generateEmptyBoard(),
@@ -491,7 +441,7 @@ export default function MinesweeperPage() {
 
   // Load tournament and leaderboard on mount
   useEffect(() => {
-    loadTournament();
+    loadTournament(true);
     loadLeaderboard(true);
 
     return () => {
@@ -553,7 +503,9 @@ export default function MinesweeperPage() {
   const getStatusMessage = () => {
     switch (gameState.gameStatus) {
       case "waiting":
-        return "Click 'New Game' to start";
+        return "Pay to start playing";
+      case "ready":
+        return "Start the game";
       case "playing":
         return "Left click to reveal, right click to flag";
       case "won":
@@ -568,6 +520,8 @@ export default function MinesweeperPage() {
   const getStatusColor = () => {
     switch (gameState.gameStatus) {
       case "waiting":
+        return "text-gray-400";
+      case "ready":
         return "text-gray-400";
       case "playing":
         return "text-green-400";
@@ -612,14 +566,6 @@ export default function MinesweeperPage() {
     if (days > 0) return `${days}d ${hours}h ${minutes}m left`;
     if (hours > 0) return `${hours}h ${minutes}m left`;
     return `${minutes}m left`;
-  };
-
-  const shouldShowNewGameButton = () => {
-    return (
-      gameState.gameStatus === "waiting" ||
-      gameState.gameStatus === "won" ||
-      gameState.gameStatus === "lost"
-    );
   };
 
   return (
@@ -672,23 +618,42 @@ export default function MinesweeperPage() {
                 )}
               </div>
               <div className="flex gap-2">
-                {showPayment ? (
-                  <div className="w-64">
-                    <GamePayment
-                      game="minesweeper"
-                      onPaymentSuccess={handlePaymentSuccess}
-                      onPaymentError={handlePaymentError}
-                    />
-                  </div>
-                ) : shouldShowNewGameButton() ? (
-                  <ShimmerButton
-                    onClick={initiateGame}
-                    disabled={loading}
-                    className="text-sm"
-                  >
-                    {loading ? "Submitting..." : "New Game"}
-                  </ShimmerButton>
-                ) : null}
+                  {showPayment ? (
+                    <div className="w-64">
+                      <GamePayment
+                        game="minesweeper"
+                        onPaymentSuccess={handlePaymentSuccess}
+                        onPaymentError={handlePaymentError}
+                      />
+                    </div>
+                  ) : showStartGameButton ? (
+                    <ShimmerButton
+                      onClick={handleStartGameButton}
+                      disabled={loading}
+                      className="text-sm"
+                    >
+                      {loading ? "Submitting..." : "Start Game"}
+                    </ShimmerButton>
+                  ) : gameState.gameStatus === "won" ||
+                    gameState.gameStatus == "lost" ? (
+                    <ShimmerButton
+                      onClick={() => {
+                        setGameState({
+                          board: [],
+                          gameStatus: "waiting",
+                          minesRemaining: TOTAL_MINES,
+                          playerName: generatePlayerName(),
+                          totalWins: 0,
+                          currentGameTime: 0,
+                        });
+                        setShowPayment(true);
+                      }}
+                      disabled={loading}
+                      className="text-sm"
+                    >
+                      Play again
+                    </ShimmerButton>
+                  ) : null}
               </div>
             </div>
 
@@ -721,7 +686,7 @@ export default function MinesweeperPage() {
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-64 text-gray-400">
-                  Click 'New Game' to start playing
+                  Click 'Start Game'
                 </div>
               )}
             </div>
@@ -753,41 +718,44 @@ export default function MinesweeperPage() {
         {/* Tournament & Leaderboard */}
         <div className="lg:col-span-1 space-y-6">
           {/* Tournament Info */}
-          {tournament && (
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">
-                  🏆 Current Tournament
-                </h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">
-                    {lastUpdateTime > 0 && formatTimeAgo(lastUpdateTime)}
-                  </span>
-                  <button
-                    onClick={() => {
-                      loadTournament(true);
-                      loadLeaderboard(true);
-                    }}
-                    disabled={loading}
-                    className="text-green-400 hover:text-green-300 transition-colors disabled:opacity-50"
-                    title="Refresh leaderboard"
+
+          <div className="bg-gray-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+            {/* heading  */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">
+                🏆 Current Tournament
+              </h3>
+              {/* sync button  */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400">
+                  {lastUpdateTime > 0 && formatTimeAgo(lastUpdateTime)}
+                </span>
+                <button
+                  onClick={() => {
+                    loadTournament(true);
+                    loadLeaderboard(true);
+                  }}
+                  disabled={loading}
+                  className="text-green-400 hover:text-green-300 transition-colors disabled:opacity-50"
+                  title="Refresh leaderboard"
+                >
+                  <svg
+                    className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                      />
-                    </svg>
-                  </button>
-                </div>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                </button>
               </div>
+            </div>
+            {tournament && (
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Entry Fee:</span>
@@ -814,8 +782,8 @@ export default function MinesweeperPage() {
                   </span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Leaderboard */}
           <div className="bg-gray-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6">

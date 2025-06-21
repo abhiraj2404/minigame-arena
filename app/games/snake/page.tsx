@@ -4,30 +4,12 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { ShimmerButton } from "@/components/magicui/shimmer-button"
 import { useWallet } from "@solana/wallet-adapter-react"
 import GamePayment from "@/components/game-payment"
+import type { LeaderboardEntry, Tournament } from "@/lib/types"
+import { generatePlayerName } from "@/lib/utils"
 
 interface Position {
   x: number
   y: number
-}
-
-interface LeaderboardEntry {
-  id: string
-  playerName: string
-  walletAddress?: string
-  score: number
-  timestamp: number
-  game: string
-}
-
-interface Tournament {
-  id: string
-  game: string
-  publicKey: string
-  prizePool: number
-  entryFee: number
-  participants: number
-  status: string
-  endDate: number // Change from endsAt to endDate to match API
 }
 
 interface GameState {
@@ -43,17 +25,6 @@ const BOARD_SIZE = 20
 const INITIAL_SNAKE = [{ x: 10, y: 10 }]
 const INITIAL_FOOD = { x: 15, y: 15 }
 const INITIAL_DIRECTION = { x: 0, y: -1 }
-
-// Generate random player names
-const ADJECTIVES = ["Swift", "Mighty", "Clever", "Bold", "Quick", "Brave", "Sharp", "Wild", "Fast", "Smart"]
-const ANIMALS = ["Snake", "Viper", "Python", "Cobra", "Serpent", "Adder", "Mamba", "Boa", "Anaconda", "Rattler"]
-
-const generatePlayerName = () => {
-  const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)]
-  const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)]
-  const number = Math.floor(Math.random() * 999) + 1
-  return `${adjective}${animal}${number}`
-}
 
 const formatWalletAddress = (address?: string) => {
   if (!address) return ""

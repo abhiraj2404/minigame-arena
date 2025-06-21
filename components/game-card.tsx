@@ -1,19 +1,29 @@
-import Link from "next/link"
-import type { ReactNode } from "react"
-import { ShimmerButton } from "@/components/magicui/shimmer-button"
+"use client";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
 interface GameCardProps {
-  id: string
-  title: string
-  description: string
-  icon: string
-  status: "available" | "coming-soon"
-  cost: string
-  preview: ReactNode
-  tags: string[]
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  status: "available" | "coming-soon";
+  cost: string;
+  preview: ReactNode;
+  tags: string[];
 }
 
-export default function GameCard({ id, title, description, icon, status, cost, preview, tags }: GameCardProps) {
+export default function GameCard({
+  id,
+  title,
+  description,
+  icon,
+  status,
+  cost,
+  preview,
+  tags,
+}: GameCardProps) {
   return (
     <div className="group relative overflow-hidden rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-white/10 hover:border-green-500/50 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-green-500/10">
       {/* Subtle gradient overlay */}
@@ -26,7 +36,9 @@ export default function GameCard({ id, title, description, icon, status, cost, p
       {/* Preview Section */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 p-4">
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        <div className="relative z-10 flex items-center justify-center h-full">{preview}</div>
+        <div className="relative z-10 flex items-center justify-center h-full">
+          {preview}
+        </div>
       </div>
 
       {/* Content Section */}
@@ -57,7 +69,9 @@ export default function GameCard({ id, title, description, icon, status, cost, p
         <div className="flex gap-3 pt-2">
           <Link href={`/games/${id}`} className="flex-1">
             {status === "available" ? (
-              <ShimmerButton className="w-full text-sm font-semibold">Play Now</ShimmerButton>
+              <ShimmerButton className="w-full text-sm font-semibold">
+                Play Now
+              </ShimmerButton>
             ) : (
               <button className="w-full px-4 py-3 text-sm font-semibold text-gray-400 bg-gray-800 border border-gray-700 rounded-lg cursor-not-allowed">
                 Coming Soon
@@ -76,5 +90,5 @@ export default function GameCard({ id, title, description, icon, status, cost, p
         </div>
       </div>
     </div>
-  )
+  );
 }
