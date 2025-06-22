@@ -136,7 +136,7 @@ export default function TetrisPage() {
     } catch (error) {
       console.error("Error loading tournament:", error);
       if (showLoading) {
-        setError("Failed to load leaderboard");
+        setError("Failed to load tournament");
       }
     } finally {
       if (showLoading) setLoading(false);
@@ -672,7 +672,7 @@ export default function TetrisPage() {
     switch (gameState.gameStatus) {
       case "waiting":
         return "text-gray-400";
-      case "waiting":
+      case "ready":
         return "text-gray-400";
       case "playing":
         return "text-green-400";

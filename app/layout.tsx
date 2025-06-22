@@ -21,9 +21,7 @@ export default function RootLayout({
             {/* Background grid pattern */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
             <Navbar />
-            <main className="relative container mx-auto px-4 py-8">
-              {children}
-            </main>
+            <main className="container mx-auto px-4 py-8">{children}</main>
           </div>
         </SolanaWalletProvider>
       </body>

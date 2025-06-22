@@ -93,12 +93,12 @@ export default function HomePage() {
         </AnimatedGradientText>
 
         <h1 className="text-6xl font-bold text-white mb-6">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-green-400 to-green-600">
+          <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-white via-green-400 to-green-600">
             Minigame Arena
           </span>
         </h1>
 
-        <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+        <p className="relative text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
           Challenge yourself with classic games, compete with players worldwide,
           and win SOL rewards in our decentralized gaming platform.
         </p>

@@ -76,7 +76,7 @@ export default function MinesweeperPage() {
     } catch (error) {
       console.error("Error loading tournament:", error);
       if (showLoading) {
-        setError("Failed to load leaderboard");
+        setError("Failed to load tournament");
       }
     } finally {
       if (showLoading) setLoading(false);
@@ -651,7 +651,7 @@ export default function MinesweeperPage() {
                       disabled={loading}
                       className="text-sm"
                     >
-                      Play again
+                      Play Again
                     </ShimmerButton>
                   ) : null}
               </div>

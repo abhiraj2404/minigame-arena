@@ -11,7 +11,7 @@ export default function Navbar() {
   const { balance, isLoading } = useWalletBalance();
 
   return (
-    <nav className="relative z-1000 border-b border-white/10 bg-black/50 backdrop-blur-xl">
+    <nav className="relative z-100 border-b border-white/10 bg-black/50 backdrop-blur-xl">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link
