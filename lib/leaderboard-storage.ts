@@ -1,266 +1,132 @@
 import type { LeaderboardEntry } from "@/lib/types";
+import { supabase } from "./supabase";
 
-// Shared leaderboard storage (in production, use a database)
-let globalLeaderboard: LeaderboardEntry[] = [
-  // Snake scores
-  {
-    id: "1",
-    playerName: "SwiftViper42",
-    walletAddress: "8ZeT7LhQXDUK1og3EGXDpSAJh7QLgvNSL4JaPPEZ9Wof",
-    score: 180,
-    timestamp: Date.now() - 86400000, // 1 day ago
-    game: "snake",
-  },
-  {
-    id: "2",
-    playerName: "MightyPython99",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 150,
-    timestamp: Date.now() - 172800000, // 2 days ago
-    game: "snake",
-  },
-  {
-    id: "3",
-    playerName: "CleverCobra7",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 120,
-    timestamp: Date.now() - 259200000, // 3 days ago
-    game: "snake",
-  },
-  {
-    id: "4",
-    playerName: "BoldSerpent23",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 90,
-    timestamp: Date.now() - 345600000, // 4 days ago
-    game: "snake",
-  },
-  {
-    id: "5",
-    playerName: "QuickMamba88",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 60,
-    timestamp: Date.now() - 432000000, // 5 days ago
-    game: "snake",
-  },
-  {
-    id: "6",
-    playerName: "FastAdder77",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 45,
-    timestamp: Date.now() - 518400000, // 6 days ago
-    game: "snake",
-  },
-  {
-    id: "7",
-    playerName: "WildAnaconda12",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 30,
-    timestamp: Date.now() - 604800000, // 7 days ago
-    game: "snake",
-  },
-  // Minesweeper wins
-  {
-    id: "8",
-    playerName: "BombDefuser99",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 15,
-    timestamp: Date.now() - 86400000, // 1 day ago
-    game: "minesweeper",
-  },
-  {
-    id: "9",
-    playerName: "MineHunter42",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 12,
-    timestamp: Date.now() - 172800000, // 2 days ago
-    game: "minesweeper",
-  },
-  {
-    id: "10",
-    playerName: "SafeClicker7",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 8,
-    timestamp: Date.now() - 259200000, // 3 days ago
-    game: "minesweeper",
-  },
-  {
-    id: "11",
-    playerName: "LogicMaster23",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 6,
-    timestamp: Date.now() - 345600000, // 4 days ago
-    game: "minesweeper",
-  },
-  {
-    id: "12",
-    playerName: "ClearField88",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 4,
-    timestamp: Date.now() - 432000000, // 5 days ago
-    game: "minesweeper",
-  },
-  // Tetris scores
-  {
-    id: "13",
-    playerName: "BlockMaster99",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 25000,
-    timestamp: Date.now() - 86400000, // 1 day ago
-    game: "tetris",
-  },
-  {
-    id: "14",
-    playerName: "LineClearer42",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 18500,
-    timestamp: Date.now() - 172800000, // 2 days ago
-    game: "tetris",
-  },
-  {
-    id: "15",
-    playerName: "TetrisKing7",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 15200,
-    timestamp: Date.now() - 259200000, // 3 days ago
-    game: "tetris",
-  },
-  {
-    id: "16",
-    playerName: "StackWizard23",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 12800,
-    timestamp: Date.now() - 345600000, // 4 days ago
-    game: "tetris",
-  },
-  {
-    id: "17",
-    playerName: "PuzzlePro88",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 9600,
-    timestamp: Date.now() - 432000000, // 5 days ago
-    game: "tetris",
-  },
-  {
-    id: "18",
-    playerName: "ShapeShifter55",
-    walletAddress: "6Hs5rvQTLYbJDvHJPUzugVgEHVNEVaRRL9KoYiP4RKZX",
-    score: 7400,
-    timestamp: Date.now() - 518400000, // 6 days ago
-    game: "tetris",
-  },
-];
+export async function getLeaderboard(
+  game: string,
+  limit = 10
+): Promise<LeaderboardEntry[] | null> {
+  let { data: leaderboard, error } = await supabase
+    .from("leaderboard")
+    .select("*")
+    .eq("game", game)
+    .order("score", { ascending: false })
+    .limit(limit);
 
-export function getLeaderboard(game?: string, limit = 10): LeaderboardEntry[] {
-  let filteredLeaderboard = globalLeaderboard;
+  if (leaderboard) console.log(`leaderboard for game ${game}: `, leaderboard);
+  if (error) console.log(`error in fetching leaderboard for ${game}: `, error);
 
-  // Filter by game if specified
-  if (game) {
-    filteredLeaderboard = globalLeaderboard.filter(
-      (entry) => entry.game === game
-    );
-  }
-
-  // Sort by score (highest first) and limit results
-  return filteredLeaderboard.sort((a, b) => b.score - a.score).slice(0, limit);
+  return leaderboard;
 }
 
-export function addScore(
+export async function addScore(
   playerName: string,
   score: number,
   game: string,
-  walletAddress?: string // Add optional wallet address parameter
-): {
+  walletAddress: string
+): Promise<{
   entry: LeaderboardEntry;
   rank: number;
   message: string;
-} {
+}> {
   // Validate input
   if (!playerName || typeof score !== "number" || score < 0) {
     throw new Error("Invalid player name or score");
   }
 
   console.log(
-    `Adding score: ${playerName}, ${score}, ${game}, ${
-      walletAddress || "no wallet"
-    }`
+    `Adding score: ${playerName}, ${score}, ${game}, ${walletAddress}`
   );
 
-  // Check if player already exists for this game
-  const existingEntryIndex = globalLeaderboard.findIndex(
-    (entry) => entry.playerName === playerName && entry.game === game
-  );
+  const { data: existingEntry, error } = await supabase
+    .from("leaderboard")
+    .select("*")
+    .eq("game", game)
+    .eq("playerName", playerName)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching existing entry:", error);
+    throw new Error("Could not add score.");
+  }
 
   let newEntry: LeaderboardEntry;
 
-  if (existingEntryIndex !== -1) {
-    // Update existing player's score if new score is higher (for snake/tetris) or always update (for minesweeper)
-    const existingEntry = globalLeaderboard[existingEntryIndex];
-    const shouldUpdate = game === "minesweeper" || score > existingEntry.score;
+  if (existingEntry) {
+    // Update existing player's score if new score is higher
+    const shouldUpdate = score > existingEntry.score;
 
     if (shouldUpdate) {
-      newEntry = {
-        ...existingEntry,
-        score:
-          game === "minesweeper" ? score : Math.max(score, existingEntry.score),
-        timestamp: Date.now(), // Update timestamp
-        walletAddress: walletAddress || existingEntry.walletAddress, // Update wallet if provided
-      };
-      globalLeaderboard[existingEntryIndex] = newEntry;
+      const { data: updatedEntry, error: updateError } = await supabase
+        .from("leaderboard")
+        .update({
+          score: Math.max(score, existingEntry.score),
+          timestamp: new Date().toISOString(),
+        })
+        .eq("id", existingEntry.id)
+        .select()
+        .single();
+
+      newEntry = updatedEntry;
+
+      if (updatedEntry) console.log("updated entry: ", updatedEntry);
+      if (updateError) {
+        console.error("Error updating score:", updateError);
+        throw new Error("Could not update score");
+      }
     } else {
-      // Keep existing higher score but update wallet if provided
-      newEntry = {
-        ...existingEntry,
-        walletAddress: walletAddress || existingEntry.walletAddress,
-      };
-      globalLeaderboard[existingEntryIndex] = newEntry;
+      newEntry = existingEntry;
     }
   } else {
-    // Create new entry
-    newEntry = {
-      id: Math.random().toString(36).substring(7),
-      playerName,
-      walletAddress: walletAddress || undefined,
-      score,
-      timestamp: Date.now(),
-      game,
-    };
-    globalLeaderboard.push(newEntry);
+    // create new entry
+    const { data, error: insertError } = await supabase
+      .from("leaderboard")
+      .insert({
+        playerName,
+        walletAddress,
+        score,
+        timestamp: new Date().toISOString(),
+        game,
+      })
+      .select()
+      .single();
+
+    newEntry = data;
+
+    if (insertError) {
+      console.log("error inserting new score: ", insertError);
+      throw new Error("could not insert new score");
+    }
   }
 
-  // Sort and keep top 100 entries
-  globalLeaderboard = globalLeaderboard
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 100);
-
   // Calculate rank for this game
-  const gameLeaderboard = getLeaderboard(game, 50);
+  const gameLeaderboard = (await getLeaderboard(game, 100)) || [];
   const rank =
-    gameLeaderboard.findIndex((entry) => entry.id === newEntry.id) + 1;
+    gameLeaderboard.findIndex(
+      (entry) => entry.playerName === newEntry.playerName
+    ) + 1;
 
   // Generate message based on rank and game
   let message = `Score submitted! You ranked #${rank} in ${game}`;
 
   if (game === "minesweeper") {
-    const winsText = score === 1 ? "win" : "wins";
     if (rank === 1) {
-      message = `🎉 New minesweeper champion! You're #1 with ${score} ${winsText}!`;
+      message = `🎉 New minesweeper champion! You're #1 with ${score} points!`;
     } else if (rank <= 3) {
-      message = `🏆 Great job! You're #${rank} on the minesweeper leaderboard with ${score} ${winsText}!`;
+      message = `🏆 Great job! You're #${rank} on the minesweeper leaderboard with ${score} points!`;
     } else if (rank <= 10) {
-      message = `🎯 Nice! You made it to the top 10 (#${rank}) with ${score} ${winsText}`;
+      message = `🎯 Nice! You made it to the top 10 (#${rank}) with ${score} points`;
     } else {
-      message = `Win recorded! You have ${score} ${winsText} (Rank #${rank})`;
+      message = `Win recorded! You have ${score} points (Rank #${rank})`;
     }
   } else if (game === "tetris") {
     if (rank === 1) {
-      message = `🎉 New Tetris champion! You're #1 with ${score.toLocaleString()} points!`;
+      message = `🎉 New Tetris champion! You're #1 with ${score} points!`;
     } else if (rank <= 3) {
-      message = `🏆 Great job! You're #${rank} on the Tetris leaderboard with ${score.toLocaleString()} points!`;
+      message = `🏆 Great job! You're #${rank} on the Tetris leaderboard with ${score} points!`;
     } else if (rank <= 10) {
-      message = `🎯 Nice! You made it to the top 10 (#${rank}) with ${score.toLocaleString()} points`;
+      message = `🎯 Nice! You made it to the top 10 (#${rank}) with ${score} points`;
     } else {
-      message = `Score recorded! ${score.toLocaleString()} points (Rank #${rank})`;
+      message = `Score recorded! ${score} points (Rank #${rank})`;
     }
   } else if (game === "snake") {
     if (rank === 1) {
@@ -269,13 +135,17 @@ export function addScore(
       message = `🏆 Great job! You're #${rank} on the ${game} leaderboard!`;
     } else if (rank <= 10) {
       message = `🎯 Nice! You made it to the top 10 (#${rank}) in ${game}`;
+    } else {
+      message = `Score recorded! ${score} points (Rank #${rank})`;
     }
   }
 
+  if (existingEntry && newEntry.score == existingEntry.score) {
+    message = "You couldn't beat your previous score, better luck next time!";
+  }
+
   console.log(
-    `New ${game} score: ${playerName} - ${score} ${
-      game === "minesweeper" ? "wins" : "points"
-    } (Rank #${rank})`
+    `New ${game} score: ${playerName} - ${score} points (Rank #${rank})`
   );
 
   return {
@@ -285,23 +155,37 @@ export function addScore(
   };
 }
 
-export function getTopScore(game: string): number {
-  const gameLeaderboard = getLeaderboard(game, 1);
-  return gameLeaderboard.length > 0 ? gameLeaderboard[0].score : 0;
+export async function getTopScore(game: string): Promise<number> {
+  const gameLeaderboard = await getLeaderboard(game, 1);
+  if (!gameLeaderboard || gameLeaderboard.length === 0) return 0;
+  return gameLeaderboard[0].score;
 }
 
-export function getPlayerRank(playerName: string, game: string): number {
-  const gameLeaderboard = getLeaderboard(game, 50);
+export async function getPlayerRank(
+  playerName: string,
+  game: string
+): Promise<number> {
+  const gameLeaderboard = await getLeaderboard(game, 100);
+  if (!gameLeaderboard) return -1;
   const rank =
     gameLeaderboard.findIndex((entry) => entry.playerName === playerName) + 1;
-  return rank || -1; // Return -1 if not found
+  return rank > 0 ? rank : -1;
 }
 
-export function getPlayerScore(playerName: string, game: string): number {
-  const entry = globalLeaderboard.find(
-    (entry) => entry.playerName === playerName && entry.game === game
-  );
-  return entry ? entry.score : 0;
-}
+export async function getPlayerScore(
+  playerName: string,
+  game: string
+): Promise<number> {
+  const { data: entry, error } = await supabase
+    .from("leaderboard")
+    .select("score")
+    .eq("playerName", playerName)
+    .eq("game", game)
+    .single();
 
-export type { LeaderboardEntry };
+  if (error || !entry) {
+    console.error("Error fetching player score: ", error);
+    return 0;
+  }
+  return entry.score;
+}

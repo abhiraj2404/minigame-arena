@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getCurrentTournament, addEntryFee } from "@/lib/tournament-system"
+import { getCurrentTournament, addEntryFee, getTournamentStatus } from "@/lib/tournament-system"
 
 export async function POST(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Game and playerWallet are required" }, { status: 400 })
     }
 
-    const tournament = getCurrentTournament(game)
+    const tournament = await getCurrentTournament(game)
 
     if (!tournament) {
       return NextResponse.json({ error: "Tournament not found" }, { status: 404 })
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
         entryFee: tournament.entryFee,
         prizePool: tournament.prizePool,
         endDate: tournament.endDate,
+        status: getTournamentStatus(tournament)
       },
     })
   } catch (error) {

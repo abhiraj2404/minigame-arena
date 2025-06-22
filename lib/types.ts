@@ -1,7 +1,7 @@
 export interface LeaderboardEntry {
   id: string;
   playerName: string;
-  walletAddress?: string;
+  walletAddress: string;
   score: number;
   timestamp: number;
   game: string;
@@ -10,11 +10,17 @@ export interface LeaderboardEntry {
 export interface Tournament {
   id: string;
   game: string;
-  startDate: number;
-  endDate: number;
-  keypair: string; // Serialized keypair
+  startDate: string;
+  endDate: string;
   publicKey: string;
   prizePool: number;
   entryFee: number;
   participants: number;
+  status?: string;
+}
+
+export interface User {
+  id: string;
+  playerName: string;
+  walletAddress: string;
 }

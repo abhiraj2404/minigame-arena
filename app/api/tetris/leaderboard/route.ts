@@ -4,12 +4,12 @@ import { getLeaderboard } from "@/lib/leaderboard-storage"
 export async function GET() {
   try {
     // Get top 10 tetris scores
-    const leaderboard = getLeaderboard("tetris", 10)
+    const leaderboard = await getLeaderboard("tetris", 10)
 
     return NextResponse.json({
       success: true,
       leaderboard,
-      total: leaderboard.length,
+      total:  leaderboard ? leaderboard.length : 0,
     })
   } catch (error) {
     console.error("Error fetching tetris leaderboard:", error)

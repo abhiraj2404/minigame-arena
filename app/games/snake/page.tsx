@@ -5,8 +5,8 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import GamePayment from "@/components/game-payment";
 import type { LeaderboardEntry, Tournament } from "@/lib/types";
-import { generatePlayerName } from "@/lib/utils";
 import { formatSol } from "@/lib/solana-config";
+import { usePlayer } from "@/components/player-context";
 
 interface Position {
   x: number;
@@ -33,13 +33,14 @@ const formatWalletAddress = (address?: string) => {
 };
 
 export default function SnakePage() {
+  const playerName = usePlayer().playerName as string;
   const [gameState, setGameState] = useState<GameState>({
     snake: INITIAL_SNAKE,
     food: INITIAL_FOOD,
     direction: INITIAL_DIRECTION,
     gameStatus: "waiting",
     score: 0,
-    playerName: generatePlayerName(),
+    playerName: playerName,
   });
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -302,18 +303,17 @@ export default function SnakePage() {
 
   // Start game
   const startGame = () => {
-    const newPlayerName = generatePlayerName();
     setGameState({
       snake: INITIAL_SNAKE,
       food: generateFood(INITIAL_SNAKE),
       direction: INITIAL_DIRECTION,
       gameStatus: "playing",
       score: 0,
-      playerName: newPlayerName,
+      playerName: playerName,
     });
     setMessage("");
     setError("");
-    console.log(`New game started for player: ${newPlayerName}`);
+    console.log(`New game started for player: ${playerName}`);
   };
 
   // Pause/Resume game
@@ -435,22 +435,6 @@ export default function SnakePage() {
     ctx.fillRect(gameState.food.x * 20 + 3, gameState.food.y * 20 + 3, 6, 6);
   }, [gameState.snake, gameState.food]);
 
-  // Load tournament and leaderboard on mount
-  const formatTimeRemaining = (endDate: number) => {
-    const now = Date.now();
-    const diff = endDate - now;
-
-    if (diff <= 0) return "Tournament ended";
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (days > 0) return `${days}d ${hours}h ${minutes}m left`;
-    if (hours > 0) return `${hours}h ${minutes}m left`;
-    return `${minutes}m left`;
-  };
-
   useEffect(() => {
     loadTournament(true);
     loadLeaderboard(true);
@@ -571,7 +555,7 @@ export default function SnakePage() {
                         direction: INITIAL_DIRECTION,
                         gameStatus: "waiting",
                         score: 0,
-                        playerName: generatePlayerName(),
+                        playerName: playerName,
                       });
                     }}
                     disabled={loading}
@@ -704,7 +688,7 @@ export default function SnakePage() {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Time Left:</span>
                   <span className="text-yellow-400 font-bold">
-                    {formatTimeRemaining(tournament.endDate)}
+                   {tournament.status}
                   </span>
                 </div>
               </div>
