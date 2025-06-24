@@ -44,3 +44,16 @@ export const generatePlayerName = () => {
   const number = Math.floor(Math.random() * 999) + 1;
   return `${adjective}${noun}${number}`;
 };
+
+export const formatTimeAgo = (timestamp: number) => {
+  const now = Date.now();
+  const diff = now - new Date(timestamp).getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor(diff / (1000 * 60));
+
+  if (days > 0) return `${days}d ago`;
+  if (hours > 0) return `${hours}h ago`;
+  if (minutes > 0) return `${minutes}m ago`;
+  return "Just now";
+};

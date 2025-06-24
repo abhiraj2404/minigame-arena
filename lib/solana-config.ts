@@ -32,3 +32,8 @@ export const formatPublicKey = (
   const key = typeof publicKey === "string" ? publicKey : publicKey.toString();
   return `${key.slice(0, 4)}...${key.slice(-4)}`;
 };
+
+export const formatWalletAddress = (address?: string) => {
+  if (!address) return "";
+  return `${address.slice(0, 4)}...${address.slice(-4)}`;
+};

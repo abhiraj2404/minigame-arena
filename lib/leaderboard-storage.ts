@@ -53,7 +53,7 @@ export async function addScore(
 
   if (existingEntry) {
     // Update existing player's score if new score is higher
-    const shouldUpdate = score > existingEntry.score;
+    const shouldUpdate = score >= existingEntry.score;
 
     if (shouldUpdate) {
       const { data: updatedEntry, error: updateError } = await supabase

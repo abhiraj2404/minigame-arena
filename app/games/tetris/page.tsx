@@ -4,10 +4,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import GamePayment from "@/components/game-payment";
-import type { LeaderboardEntry, Tournament } from "@/lib/types";
-import { formatSol } from "@/lib/solana-config";
 import { usePlayer } from "@/components/player-context";
-
+import Leaderboard from "@/components/leaderboard";
+import Tournament from "@/components/tournament";
 interface Position {
   x: number;
   y: number;
@@ -93,7 +92,6 @@ const PIECES = [
 
 export default function TetrisPage() {
   const playerName = usePlayer().playerName as string;
-  const { publicKey } = useWallet();
   const [gameState, setGameState] = useState<GameState>({
     board: Array(BOARD_HEIGHT)
       .fill(null)
@@ -107,68 +105,21 @@ export default function TetrisPage() {
     playerName: playerName,
   });
 
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [tournament, setTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [lastUpdateTime, setLastUpdateTime] = useState<number>(0);
+  const [highScore, setHighScore] = useState<number>(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const { publicKey } = useWallet();
   const [showPayment, setShowPayment] = useState(true);
 
   const gameLoopRef = useRef<NodeJS.Timeout>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nextPieceCanvasRef = useRef<HTMLCanvasElement>(null);
-  const tournamentUpdateRef = useRef<NodeJS.Timeout>();
 
-  // Load tournament data
-  const loadTournament = async (showLoading = false) => {
-    try {
-      if (showLoading) setLoading(true);
-
-      const response = await fetch("/api/tournaments?game=tetris");
-      if (response.ok) {
-        const data = await response.json();
-        setTournament(data.tournament);
-        setLastUpdateTime(Date.now());
-        console.log("Tetris tournament loaded:", data.tournament);
-      } else {
-        console.error("Failed to load tournament data");
-      }
-    } catch (error) {
-      console.error("Error loading tournament:", error);
-      if (showLoading) {
-        setError("Failed to load tournament");
-      }
-    } finally {
-      if (showLoading) setLoading(false);
-    }
-  };
-
-  // Load leaderboard
-  const loadLeaderboard = async (showLoading = false) => {
-    try {
-      if (showLoading) setLoading(true);
-
-      const response = await fetch("/api/tetris/leaderboard");
-      if (response.ok) {
-        const data = await response.json();
-        setLeaderboard(data.leaderboard || []);
-
-        setLastUpdateTime(Date.now());
-        console.log(
-          "Tetris leaderboard updated:",
-          data.leaderboard?.length || 0,
-          "entries"
-        );
-      }
-    } catch (error) {
-      console.error("Failed to load leaderboard:", error);
-      if (showLoading) {
-        setError("Failed to load leaderboard");
-      }
-    } finally {
-      if (showLoading) setLoading(false);
-    }
+  const triggerRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   // Submit score to backend with wallet address
@@ -197,7 +148,7 @@ export default function TetrisPage() {
 
         // Immediately refresh leaderboard
         setTimeout(() => {
-          loadLeaderboard();
+          triggerRefresh();
         }, 500);
 
         console.log(`Tetris score submitted successfully. Rank: #${data.rank}`);
@@ -221,6 +172,7 @@ export default function TetrisPage() {
   const handlePaymentSuccess = () => {
     setMessage("Payment successful! You can now start the game.");
     setShowPayment(false);
+    triggerRefresh();
     setGameState((gamestate) => ({
       ...gamestate,
       gameStatus: "ready",
@@ -228,7 +180,6 @@ export default function TetrisPage() {
   };
 
   const handleStartGameButton = () => {
-    loadTournament(true);
     startGame();
   };
 
@@ -640,18 +591,6 @@ export default function TetrisPage() {
     }
   }, [gameState.nextPiece]);
 
-  // Load tournament and leaderboard on mount
-  useEffect(() => {
-    loadTournament(true);
-    loadLeaderboard(true);
-
-    return () => {
-      if (tournamentUpdateRef.current) {
-        clearInterval(tournamentUpdateRef.current);
-      }
-    };
-  }, []);
-
   const getStatusMessage = () => {
     switch (gameState.gameStatus) {
       case "waiting":
@@ -686,21 +625,8 @@ export default function TetrisPage() {
     }
   };
 
-  const formatTimeAgo = (timestamp: number) => {
-    const now = Date.now();
-    const diff = now - timestamp;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor(diff / (1000 * 60));
-
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    if (minutes > 0) return `${minutes}m ago`;
-    return "Just now";
-  };
-
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="relative max-w-7xl mx-auto space-y-8">
       <div className="text-center space-y-4">
         <h1 className="text-5xl font-bold text-white">🧩 Tetris</h1>
         <p className="text-gray-300 text-lg">
@@ -730,11 +656,6 @@ export default function TetrisPage() {
                     Player: {gameState.playerName}
                   </span>
                 </div>
-                <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                  <span className="text-blue-400 font-semibold text-sm">
-                    Score: {gameState.score.toLocaleString()}
-                  </span>
-                </div>
                 <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
                   <span className="text-purple-400 font-semibold text-sm">
                     Level: {gameState.level}
@@ -745,6 +666,18 @@ export default function TetrisPage() {
                     Lines: {gameState.lines}
                   </span>
                 </div>
+                <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                  <span className="text-blue-400 font-semibold text-sm">
+                    Score: {gameState.score.toLocaleString()}
+                  </span>
+                </div>
+                {highScore > 0 && (
+                  <div className="px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <span className="text-yellow-400 font-semibold">
+                      High: {highScore}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="flex justify-center">
                 {showPayment ? (
@@ -759,6 +692,7 @@ export default function TetrisPage() {
                   <ShimmerButton
                     onClick={() => {
                       setShowPayment(true);
+                      setMessage("");
                       setGameState({
                         board: Array(BOARD_HEIGHT)
                           .fill(null)
@@ -861,179 +795,21 @@ export default function TetrisPage() {
         {/* Tournament & Leaderboard */}
         <div className="lg:col-span-1 space-y-6">
           {/* Tournament Info */}
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            {/* heading  */}
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">
-                🏆 Current Tournament
-              </h3>
-              {/* sync button  */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">
-                  {lastUpdateTime > 0 && formatTimeAgo(lastUpdateTime)}
-                </span>
-                <button
-                  onClick={() => {
-                    loadTournament(true);
-                    loadLeaderboard(true);
-                  }}
-                  disabled={loading}
-                  className="text-green-400 hover:text-green-300 transition-colors disabled:opacity-50"
-                  title="Refresh leaderboard"
-                >
-                  <svg
-                    className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            {tournament && (
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Entry Fee:</span>
-                  <span className="text-green-400 font-bold">
-                    {formatSol(tournament.entryFee)} SOL
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Prize Pool:</span>
-                  <span className="text-blue-400 font-bold">
-                    {formatSol(tournament.prizePool)} SOL
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Participants:</span>
-                  <span className="text-purple-400 font-bold">
-                    {tournament.participants}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Time Left:</span>
-                  <span className="text-yellow-400 font-bold">
-                    {tournament.status}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
+          <Tournament
+            game="tetris"
+            setError={setError}
+            refreshTrigger={refreshTrigger}
+          />
 
           {/* Leaderboard */}
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">🏆 Leaderboard</h3>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">
-                  {lastUpdateTime > 0 && formatTimeAgo(lastUpdateTime)}
-                </span>
-                <button
-                  onClick={() => {
-                    loadLeaderboard(true);
-                    loadTournament(true);
-                  }}
-                  disabled={loading}
-                  className="text-green-400 hover:text-green-300 transition-colors disabled:opacity-50"
-                  title="Refresh leaderboard"
-                >
-                  <svg
-                    className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {leaderboard.length > 0 ? (
-                leaderboard.map((entry, index) => (
-                  <div
-                    key={entry.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-300 ${
-                      entry.playerName === gameState.playerName &&
-                      gameState.gameStatus === "gameOver"
-                        ? "bg-green-500/20 border-green-500/50 ring-2 ring-green-500/30"
-                        : index === 0
-                        ? "bg-yellow-500/10 border-yellow-500/30"
-                        : index === 1
-                        ? "bg-gray-400/10 border-gray-400/30"
-                        : index === 2
-                        ? "bg-orange-500/10 border-orange-500/30"
-                        : "bg-gray-800/50 border-gray-700/30"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                          index === 0
-                            ? "bg-yellow-500 text-black"
-                            : index === 1
-                            ? "bg-gray-400 text-black"
-                            : index === 2
-                            ? "bg-orange-500 text-black"
-                            : "bg-gray-700 text-white"
-                        }`}
-                      >
-                        {index + 1}
-                      </div>
-                      <div>
-                        <p className="text-white font-semibold text-sm">
-                          {entry.playerName}
-                        </p>
-                        <p className="text-gray-400 text-xs">
-                          {formatTimeAgo(entry.timestamp)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-green-400 font-bold">
-                        {entry.score.toLocaleString()}
-                      </p>
-                      <p className="text-gray-500 text-xs">points</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-400 py-8">
-                  <p>No scores yet!</p>
-                  <p className="text-sm">Be the first to play!</p>
-                </div>
-              )}
-            </div>
-
-            {gameState.score > 0 && gameState.gameStatus === "gameOver" && (
-              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                <p className="text-blue-400 text-sm text-center">
-                  Your final score:{" "}
-                  <span className="font-bold">
-                    {gameState.score.toLocaleString()}
-                  </span>
-                  {gameState.score > leaderboard[0]?.score && (
-                    <span className="block text-yellow-400 font-bold">
-                      🎉 New High Score!
-                    </span>
-                  )}
-                </p>
-              </div>
-            )}
-          </div>
+          <Leaderboard
+            game="tetris"
+            setError={setError}
+            gameState={gameState}
+            highScore={highScore}
+            setHighScore={setHighScore}
+            refreshTrigger={refreshTrigger}
+          />
         </div>
       </div>
     </div>
