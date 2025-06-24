@@ -6,6 +6,7 @@ import "./globals.css";
 import Navbar from "../components/navbar";
 import { SolanaWalletProvider } from "@/components/wallet-provider";
 import { PlayerProvider } from "@/components/player-context";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-black min-h-screen text-white`}>
+        <Analytics />
         <SolanaWalletProvider>
           <PlayerProvider>
             <div className="relative min-h-screen bg-black">
