@@ -12,6 +12,13 @@ interface LeaderboardProps {
   refreshTrigger: number;
 }
 
+// Helper to format seconds as mm:ss
+const formatTime = (seconds: number) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
+
 export default function Leaderboard({
   game,
   gameState,
@@ -161,8 +168,19 @@ export default function Leaderboard({
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-green-400 font-bold">{entry.score}</p>
-                <p className="text-gray-500 text-xs">points</p>
+                {game === "minesweeper" ? (
+                  <>
+                    <p className="text-green-400 font-bold">
+                      {formatTime(entry.score)}
+                    </p>
+                    <p className="text-gray-500 text-xs">min</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-green-400 font-bold">{entry.score}</p>
+                    <p className="text-gray-500 text-xs">points</p>
+                  </>
+                )}
               </div>
             </div>
           ))

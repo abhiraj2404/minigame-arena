@@ -439,6 +439,7 @@ export default function SnakePage() {
                     onClick={() => {
                       setShowPayment(true);
                       setMessage("");
+                      setError("");
                       setGameState({
                         snake: INITIAL_SNAKE,
                         food: INITIAL_FOOD,

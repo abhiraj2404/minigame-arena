@@ -9,10 +9,10 @@ export async function getLeaderboard(
     .from("leaderboard")
     .select("*")
     .eq("game", game)
-    .order("score", { ascending: false })
+    .order("score", { ascending: game === "minesweeper" ? true : false })
     .limit(limit);
 
-  if (leaderboard) console.log(`leaderboard for game ${game}: `, leaderboard);
+  if (leaderboard) console.log(`leaderboard for game ${game} fetched`);
   if (error) console.log(`error in fetching leaderboard for ${game}: `, error);
 
   return leaderboard;
@@ -52,14 +52,21 @@ export async function addScore(
   let newEntry: LeaderboardEntry;
 
   if (existingEntry) {
-    // Update existing player's score if new score is higher
-    const shouldUpdate = score >= existingEntry.score;
+    // Update existing player's score if new score is better
+    let shouldUpdate;
+    if (game === "minesweeper") {
+      // Lower time is better
+      shouldUpdate = score < existingEntry.score;
+    } else {
+      // Higher score is better
+      shouldUpdate = score >= existingEntry.score;
+    }
 
     if (shouldUpdate) {
       const { data: updatedEntry, error: updateError } = await supabase
         .from("leaderboard")
         .update({
-          score: Math.max(score, existingEntry.score),
+          score: score,
           timestamp: new Date().toISOString(),
         })
         .eq("id", existingEntry.id)
@@ -110,13 +117,13 @@ export async function addScore(
 
   if (game === "minesweeper") {
     if (rank === 1) {
-      message = `🎉 New minesweeper champion! You're #1 with ${score} points!`;
+      message = `🎉 New minesweeper champion! You're #1 with ${score} seconds!`;
     } else if (rank <= 3) {
-      message = `🏆 Great job! You're #${rank} on the minesweeper leaderboard with ${score} points!`;
+      message = `🏆 Great job! You're #${rank} on the minesweeper leaderboard with ${score} seconds!`;
     } else if (rank <= 10) {
-      message = `🎯 Nice! You made it to the top 10 (#${rank}) with ${score} points`;
+      message = `🎯 Nice! You made it to the top 10 (#${rank}) with ${score} seconds`;
     } else {
-      message = `Win recorded! You have ${score} points (Rank #${rank})`;
+      message = `Win recorded! You have ${score} seconds (Rank #${rank})`;
     }
   } else if (game === "tetris") {
     if (rank === 1) {
@@ -141,7 +148,12 @@ export async function addScore(
   }
 
   if (existingEntry && newEntry.score == existingEntry.score) {
-    message = "You couldn't beat your previous score, better luck next time!";
+    if (game === "minesweeper") {
+      message =
+        "You couldn't beat your previous best time, better luck next time!";
+    } else {
+      message = "You couldn't beat your previous score, better luck next time!";
+    }
   }
 
   console.log(
@@ -188,4 +200,10 @@ export async function getPlayerScore(
     return 0;
   }
   return entry.score;
+}
+
+export async function resetLeaderboard(game: string): Promise<void> {
+  await supabase.from("leaderboard").delete().eq("game", game);
+
+  console.log(`deleted leaderboard for ${game}`);
 }

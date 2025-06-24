@@ -693,6 +693,7 @@ export default function TetrisPage() {
                     onClick={() => {
                       setShowPayment(true);
                       setMessage("");
+                      setError("");
                       setGameState({
                         board: Array(BOARD_HEIGHT)
                           .fill(null)

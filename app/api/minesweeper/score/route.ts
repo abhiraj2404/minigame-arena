@@ -14,30 +14,30 @@ export async function POST(request: Request) {
       );
     }
 
-    const { playerName, wins, walletAddress } = requestData;
+    const { playerName, time, walletAddress } = requestData;
 
-    if (!playerName || typeof wins !== "number") {
+    if (!playerName || typeof time !== "number") {
       return NextResponse.json(
-        { error: "Invalid player name or wins count" },
+        { error: "Invalid player name or time" },
         { status: 400 }
       );
     }
 
-    if (wins < 1) {
+    if (time < 1) {
       return NextResponse.json(
-        { error: "Wins must be at least 1" },
+        { error: "Time must be at least 1 second" },
         { status: 400 }
       );
     }
 
     console.log(
-      `Submitting Minesweeper win: ${playerName} - ${wins} - ${walletAddress}`
+      `Submitting Minesweeper win: ${playerName} - ${time} seconds - ${walletAddress}`
     );
 
-    // Add win to shared leaderboard (score = number of wins)
+    // Add win to shared leaderboard (score = time taken)
     const result = await addScore(
       playerName,
-      wins,
+      time,
       "minesweeper",
       walletAddress
     );

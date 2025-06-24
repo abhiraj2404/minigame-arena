@@ -58,10 +58,10 @@ export default function MinesweeperPage() {
   };
 
   // Submit win to backend
-  const submitWin = async (playerName: string, totalWins: number) => {
+  const submitWin = async (playerName: string, timeTaken: number) => {
     try {
       setLoading(true);
-      console.log(`Submitting win: ${playerName} - ${totalWins} total wins`);
+      console.log(`Submitting win: ${playerName} - ${timeTaken} seconds`);
 
       const response = await fetch("/api/minesweeper/score", {
         method: "POST",
@@ -70,7 +70,7 @@ export default function MinesweeperPage() {
         },
         body: JSON.stringify({
           playerName,
-          wins: totalWins,
+          time: timeTaken,
           walletAddress: publicKey ? publicKey.toString() : undefined,
         }),
       });
@@ -326,21 +326,18 @@ export default function MinesweeperPage() {
 
       // Check win condition
       if (checkWinCondition(newBoard)) {
-        const newTotalWins = prevState.totalWins + 1;
-
         // Stop timer
         if (gameTimer) {
           clearInterval(gameTimer);
         }
 
-        // Submit win to backend
-        submitWin(prevState.playerName, newTotalWins);
+        // Submit win to backend (score = time taken)
+        submitWin(prevState.playerName, prevState.currentGameTime + 1); // +1 to include the last second
 
         return {
           ...prevState,
           board: newBoard,
           gameStatus: "won",
-          totalWins: newTotalWins,
         };
       }
 
@@ -509,7 +506,7 @@ export default function MinesweeperPage() {
                 </div>
                 <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                   <span className="text-blue-400 font-semibold">
-                    Wins: {gameState.totalWins}
+                    Best Time: {highScore > 0 ? formatTime(highScore) : "--:--"}
                   </span>
                 </div>
                 <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
@@ -548,6 +545,7 @@ export default function MinesweeperPage() {
                     onClick={() => {
                       setShowPayment(true);
                       setMessage("");
+                      setError("");
                       setGameState({
                         board: [],
                         gameStatus: "waiting",

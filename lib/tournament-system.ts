@@ -2,6 +2,16 @@ import { Keypair } from "@solana/web3.js";
 import type { Tournament } from "@/lib/types";
 import { GAME_FEES } from "./constants";
 import { supabase } from "./supabase";
+import {
+  Connection,
+  Keypair as SolanaKeypair,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
+import { solToLamports, endpoint } from "./solana-config";
+import bs58 from "bs58";
 
 // Tournament duration in milliseconds (3 days)
 const TOURNAMENT_DURATION = 3 * 24 * 60 * 60 * 1000;
@@ -19,7 +29,7 @@ export async function getKeypairs(game: string) {
 }
 
 // Initialize tournaments for each game
-export function initializeTournaments() {
+export async function initializeTournaments() {
   Object.entries(GAME_FEES).forEach(async ([game, fees]) => {
     const tournament = await getCurrentTournament(game);
     if (!tournament) {
@@ -52,7 +62,7 @@ export async function createNewTournament(
     .select()
     .single();
 
-  if (data) console.log("creating new tournament", data);
+  if (data) console.log("creating new tournament for: ", game);
   if (error) console.log("error in creating new tournament", error);
 
   return data;
@@ -69,7 +79,7 @@ export async function getCurrentTournament(
       .eq("game", game)
       .maybeSingle();
 
-    if (tournament) console.log("current tournament : ", tournament);
+    if (tournament) console.log("current tournament fetched for: ", game);
     if (error) console.log("error fetching current tournament: ", error);
 
     // If tournament exists but has ended, create a new one
@@ -130,6 +140,76 @@ export function getTournamentStatus(tournament: Tournament): string {
   } else {
     return `${minutes}m left`;
   }
+}
+
+// Fetch all tournaments
+export async function getAllTournaments(): Promise<Tournament[]> {
+  const { data, error } = await supabase.from("tournament").select("*");
+  if (error) {
+    console.error("Error fetching all tournaments:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// Send SOL from a tournament keypair to a winner
+export async function sendPrizeToWinner({
+  fromSecretKey,
+  toPublicKey,
+  amountSol,
+}: {
+  fromSecretKey: Uint8Array | number[] | string;
+  toPublicKey: string;
+  amountSol: number;
+}): Promise<string | null> {
+  try {
+    const connection = new Connection(endpoint, "confirmed");
+    let secretKeyUint8: Uint8Array;
+    if (typeof fromSecretKey === "string") {
+      // Assume base58 encoded
+      secretKeyUint8 = bs58.decode(fromSecretKey);
+    } else if (Array.isArray(fromSecretKey)) {
+      secretKeyUint8 = Uint8Array.from(fromSecretKey);
+    } else {
+      secretKeyUint8 = fromSecretKey;
+    }
+    const from = SolanaKeypair.fromSecretKey(secretKeyUint8);
+    const to = new PublicKey(toPublicKey);
+    const lamports = solToLamports(amountSol);
+
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: from.publicKey,
+        toPubkey: to,
+        lamports,
+      })
+    );
+
+    const signature = await sendAndConfirmTransaction(connection, transaction, [
+      from,
+    ]);
+    return signature;
+  } catch (error) {
+    console.error("Error sending prize to winner:", error);
+    return null;
+  }
+}
+
+export async function resetTournament(game: string) {
+
+  console.log(`deleting tournament for ${game}`)
+  // Delete the old tournament before creating a new one
+  const { data, error } = await supabase
+    .from("tournament")
+    .delete()
+    .eq("game", game);
+
+  if (data) console.log(data);
+  if (error) console.log(error);
+
+  // Immediately create a new tournament for this game
+  const entryFee = GAME_FEES[game as keyof typeof GAME_FEES];
+  await createNewTournament(game, entryFee);
 }
 
 // Initialize tournaments on module load
