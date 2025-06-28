@@ -23,7 +23,6 @@ interface GameState {
   board: Cell[][];
   gameStatus: "waiting" | "ready" | "playing" | "won" | "lost";
   minesRemaining: number;
-  playerName: string;
   totalWins: number;
   currentGameTime: number;
 }
@@ -33,13 +32,13 @@ const TOTAL_MINES = 10;
 
 export default function MinesweeperPage() {
   const playerName = usePlayer().playerName as string;
+  console.log("playername from minesweeper page:", playerName);
   const [gameState, setGameState] = useState<GameState>({
     board: [],
     gameStatus: "waiting",
     minesRemaining: TOTAL_MINES,
-    playerName: playerName,
     totalWins: 0,
-    currentGameTime: 0,
+    currentGameTime: 0
   });
 
   const [loading, setLoading] = useState(false);
@@ -61,18 +60,17 @@ export default function MinesweeperPage() {
   const submitWin = async (playerName: string, timeTaken: number) => {
     try {
       setLoading(true);
-      console.log(`Submitting win: ${playerName} - ${timeTaken} seconds`);
 
       const response = await fetch("/api/minesweeper/score", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           playerName,
           time: timeTaken,
-          walletAddress: publicKey ? publicKey.toString() : undefined,
-        }),
+          walletAddress: publicKey ? publicKey.toString() : undefined
+        })
       });
 
       if (response.ok) {
@@ -83,19 +81,13 @@ export default function MinesweeperPage() {
         setTimeout(() => {
           triggerRefresh();
         }, 500);
-
-        console.log(`Win submitted successfully. Rank: #${data.rank}`);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to submit win");
       }
     } catch (error) {
       console.error("Failed to submit win:", error);
-      setError(
-        `Failed to submit win: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      setError(`Failed to submit win: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setLoading(false);
     }
@@ -109,7 +101,7 @@ export default function MinesweeperPage() {
     triggerRefresh();
     setGameState((gamestate) => ({
       ...gamestate,
-      gameStatus: "ready",
+      gameStatus: "ready"
     }));
   };
 
@@ -136,16 +128,13 @@ export default function MinesweeperPage() {
             isFlagged: false,
             adjacentMines: 0,
             row,
-            col,
+            col
           }))
       );
   };
 
   // Generate board with mines (after first click)
-  const generateBoardWithMines = (
-    firstClickRow: number,
-    firstClickCol: number
-  ): Cell[][] => {
+  const generateBoardWithMines = (firstClickRow: number, firstClickCol: number): Cell[][] => {
     const board = generateEmptyBoard();
 
     // Place mines randomly, avoiding first click position
@@ -156,10 +145,7 @@ export default function MinesweeperPage() {
       const pos = `${row}-${col}`;
 
       // Don't place mine on first click or adjacent cells
-      if (
-        Math.abs(row - firstClickRow) <= 1 &&
-        Math.abs(col - firstClickCol) <= 1
-      ) {
+      if (Math.abs(row - firstClickRow) <= 1 && Math.abs(col - firstClickCol) <= 1) {
         continue;
       }
 
@@ -181,13 +167,7 @@ export default function MinesweeperPage() {
             for (let dc = -1; dc <= 1; dc++) {
               const newRow = row + dr;
               const newCol = col + dc;
-              if (
-                newRow >= 0 &&
-                newRow < BOARD_SIZE &&
-                newCol >= 0 &&
-                newCol < BOARD_SIZE &&
-                board[newRow][newCol].isMine
-              ) {
+              if (newRow >= 0 && newRow < BOARD_SIZE && newCol >= 0 && newCol < BOARD_SIZE && board[newRow][newCol].isMine) {
                 count++;
               }
             }
@@ -197,28 +177,12 @@ export default function MinesweeperPage() {
       }
     }
 
-    console.log(
-      "Generated board with mines at:",
-      board
-        .flatMap((row, r) =>
-          row.map((cell, c) => (cell.isMine ? `${r},${c}` : null))
-        )
-        .filter(Boolean)
-    );
-
     return board;
   };
 
   // Reveal cell and adjacent empty cells
   const revealCell = (board: Cell[][], row: number, col: number): Cell[][] => {
-    if (
-      row < 0 ||
-      row >= BOARD_SIZE ||
-      col < 0 ||
-      col >= BOARD_SIZE ||
-      board[row][col].isRevealed ||
-      board[row][col].isFlagged
-    ) {
+    if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE || board[row][col].isRevealed || board[row][col].isFlagged) {
       return board;
     }
 
@@ -264,9 +228,8 @@ export default function MinesweeperPage() {
       board: generateEmptyBoard(),
       gameStatus: "playing",
       minesRemaining: TOTAL_MINES,
-      playerName: newPlayerName,
       totalWins: 0,
-      currentGameTime: 0,
+      currentGameTime: 0
     });
     setMessage("");
     setError("");
@@ -276,12 +239,10 @@ export default function MinesweeperPage() {
     const timer = setInterval(() => {
       setGameState((prev) => ({
         ...prev,
-        currentGameTime: Math.floor((Date.now() - startTime) / 1000),
+        currentGameTime: Math.floor((Date.now() - startTime) / 1000)
       }));
     }, 1000);
     setGameTimer(timer);
-
-    console.log(`New minesweeper game started for player: ${newPlayerName}`);
   };
 
   // Handle cell click
@@ -305,7 +266,7 @@ export default function MinesweeperPage() {
         const gameOverBoard = newBoard.map((boardRow) =>
           boardRow.map((boardCell) => ({
             ...boardCell,
-            isRevealed: boardCell.isMine ? true : boardCell.isRevealed,
+            isRevealed: boardCell.isMine ? true : boardCell.isRevealed
           }))
         );
 
@@ -317,7 +278,7 @@ export default function MinesweeperPage() {
         return {
           ...prevState,
           board: gameOverBoard,
-          gameStatus: "lost",
+          gameStatus: "lost"
         };
       }
 
@@ -332,25 +293,23 @@ export default function MinesweeperPage() {
         }
 
         // Submit win to backend (score = time taken)
-        submitWin(prevState.playerName, prevState.currentGameTime + 1); // +1 to include the last second
+        submitWin(playerName, prevState.currentGameTime + 1); // +1 to include the last second
 
         return {
           ...prevState,
           board: newBoard,
-          gameStatus: "won",
+          gameStatus: "won"
         };
       }
 
       // Update mines remaining
-      const flaggedMines = newBoard
-        .flat()
-        .filter((cell) => cell.isFlagged).length;
+      const flaggedMines = newBoard.flat().filter((cell) => cell.isFlagged).length;
       const minesRemaining = TOTAL_MINES - flaggedMines;
 
       return {
         ...prevState,
         board: newBoard,
-        minesRemaining,
+        minesRemaining
       };
     });
   };
@@ -365,21 +324,17 @@ export default function MinesweeperPage() {
     if (!cell || cell.isRevealed) return;
 
     setGameState((prevState) => {
-      const newBoard = prevState.board.map((boardRow) =>
-        boardRow.map((boardCell) => ({ ...boardCell }))
-      );
+      const newBoard = prevState.board.map((boardRow) => boardRow.map((boardCell) => ({ ...boardCell })));
 
       newBoard[row][col].isFlagged = !newBoard[row][col].isFlagged;
 
-      const flaggedMines = newBoard
-        .flat()
-        .filter((cell) => cell.isFlagged).length;
+      const flaggedMines = newBoard.flat().filter((cell) => cell.isFlagged).length;
       const minesRemaining = TOTAL_MINES - flaggedMines;
 
       return {
         ...prevState,
         board: newBoard,
-        minesRemaining,
+        minesRemaining
       };
     });
   };
@@ -408,8 +363,7 @@ export default function MinesweeperPage() {
     if (cell.isRevealed) {
       baseStyle += "cursor-default ";
       if (cell.isMine) {
-        baseStyle +=
-          "bg-red-600 text-white border-red-500 shadow-lg shadow-red-500/50 ";
+        baseStyle += "bg-red-600 text-white border-red-500 shadow-lg shadow-red-500/50 ";
       } else {
         baseStyle += "bg-gray-800 border-green-500/30 ";
         // Color code numbers
@@ -423,8 +377,7 @@ export default function MinesweeperPage() {
         else if (cell.adjacentMines === 8) baseStyle += "text-gray-400 ";
       }
     } else {
-      baseStyle +=
-        "cursor-pointer bg-gray-700 hover:bg-gray-600 hover:border-green-400/50 hover:scale-105 active:scale-95 ";
+      baseStyle += "cursor-pointer bg-gray-700 hover:bg-gray-600 hover:border-green-400/50 hover:scale-105 active:scale-95 ";
       if (cell.isFlagged) {
         baseStyle += "bg-yellow-600 border-yellow-500 ";
       }
@@ -477,19 +430,9 @@ export default function MinesweeperPage() {
     <div className="relative max-w-7xl mx-auto space-y-8">
       <div className="text-center space-y-4">
         <h1 className="text-5xl font-bold text-white">💣 Minesweeper</h1>
-        <p className="text-gray-300 text-lg">
-          Clear the minefield and climb the leaderboard!
-        </p>
-        {message && (
-          <div className="bg-green-900/50 border border-green-500/50 rounded-lg p-3 text-green-200">
-            {message}
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3 text-red-200">
-            {error}
-          </div>
-        )}
+        <p className="text-gray-300 text-lg">Clear the minefield and climb the leaderboard!</p>
+        {message && <div className="bg-green-900/50 border border-green-500/50 rounded-lg p-3 text-green-200">{message}</div>}
+        {error && <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3 text-red-200">{error}</div>}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -499,48 +442,28 @@ export default function MinesweeperPage() {
             {/* Game Stats */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-4">
-                <div className="px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg">
-                  <span className="text-green-400 font-semibold">
-                    Player: {gameState.playerName}
-                  </span>
-                </div>
                 <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                  <span className="text-blue-400 font-semibold">
-                    Best Time: {highScore > 0 ? formatTime(highScore) : "--:--"}
-                  </span>
+                  <span className="text-blue-400 font-semibold">Best Time: {highScore > 0 ? formatTime(highScore) : "--:--"}</span>
                 </div>
                 <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                  <span className="text-purple-400 font-semibold">
-                    Mines: {gameState.minesRemaining}
-                  </span>
+                  <span className="text-purple-400 font-semibold">Mines: {gameState.minesRemaining}</span>
                 </div>
                 {gameState.gameStatus === "playing" && (
                   <div className="px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                    <span className="text-yellow-400 font-semibold">
-                      Time: {formatTime(gameState.currentGameTime)}
-                    </span>
+                    <span className="text-yellow-400 font-semibold">Time: {formatTime(gameState.currentGameTime)}</span>
                   </div>
                 )}
               </div>
               <div className="flex gap-2">
                 {showPayment ? (
                   <div className="w-64">
-                    <GamePayment
-                      game="minesweeper"
-                      onPaymentSuccess={handlePaymentSuccess}
-                      onPaymentError={handlePaymentError}
-                    />
+                    <GamePayment game="minesweeper" onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
                   </div>
                 ) : showStartGameButton ? (
-                  <ShimmerButton
-                    onClick={handleStartGameButton}
-                    disabled={loading}
-                    className="text-sm"
-                  >
+                  <ShimmerButton onClick={handleStartGameButton} disabled={loading} className="text-sm">
                     {loading ? "Submitting..." : "Start Game"}
                   </ShimmerButton>
-                ) : gameState.gameStatus === "won" ||
-                  gameState.gameStatus == "lost" ? (
+                ) : gameState.gameStatus === "won" || gameState.gameStatus == "lost" ? (
                   <ShimmerButton
                     onClick={() => {
                       setShowPayment(true);
@@ -550,9 +473,8 @@ export default function MinesweeperPage() {
                         board: [],
                         gameStatus: "waiting",
                         minesRemaining: TOTAL_MINES,
-                        playerName: playerName,
                         totalWins: 0,
-                        currentGameTime: 0,
+                        currentGameTime: 0
                       });
                     }}
                     disabled={loading}
@@ -579,12 +501,8 @@ export default function MinesweeperPage() {
                         key={`${rowIndex}-${colIndex}`}
                         className={getCellStyle(cell)}
                         onClick={() => handleCellClick(rowIndex, colIndex)}
-                        onContextMenu={(e) =>
-                          handleRightClick(e, rowIndex, colIndex)
-                        }
-                        disabled={
-                          gameState.gameStatus !== "playing" || cell.isRevealed
-                        }
+                        onContextMenu={(e) => handleRightClick(e, rowIndex, colIndex)}
+                        disabled={gameState.gameStatus !== "playing" || cell.isRevealed}
                       >
                         {getCellContent(cell)}
                       </button>
@@ -592,9 +510,7 @@ export default function MinesweeperPage() {
                   )}
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-64 text-gray-400">
-                  Click 'Start Game'
-                </div>
+                <div className="flex items-center justify-center h-64 text-gray-400">Click 'Start Game'</div>
               )}
             </div>
 
@@ -626,11 +542,7 @@ export default function MinesweeperPage() {
         <div className="lg:col-span-1 space-y-6">
           {/* Tournament Info */}
 
-          <Tournament
-            game="minesweeper"
-            setError={setError}
-            refreshTrigger={refreshTrigger}
-          />
+          <Tournament game="minesweeper" setError={setError} refreshTrigger={refreshTrigger} />
 
           {/* Leaderboard */}
           <Leaderboard

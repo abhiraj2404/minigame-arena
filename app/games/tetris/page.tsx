@@ -26,7 +26,6 @@ interface GameState {
   score: number;
   level: number;
   lines: number;
-  playerName: string;
 }
 
 const BOARD_WIDTH = 10;
@@ -101,8 +100,7 @@ export default function TetrisPage() {
     gameStatus: "waiting",
     score: 0,
     level: 1,
-    lines: 0,
-    playerName: playerName,
+    lines: 0
   });
 
   const [loading, setLoading] = useState(false);
@@ -311,8 +309,7 @@ export default function TetrisPage() {
       gameStatus: "playing",
       score: 0,
       level: 1,
-      lines: 0,
-      playerName: newPlayerName,
+      lines: 0
     });
     setMessage("");
     setError("");
@@ -388,7 +385,7 @@ export default function TetrisPage() {
               !canPlacePiece(nextCurrentPiece, clearedBoard)
             ) {
               // Game over
-              submitScore(newScore, prevState.playerName);
+              submitScore(newScore, playerName);
               return {
                 ...prevState,
                 board: clearedBoard,
@@ -651,11 +648,6 @@ export default function TetrisPage() {
             {/* Game Stats */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-4">
-                <div className="px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg">
-                  <span className="text-green-400 font-semibold text-sm">
-                    Player: {gameState.playerName}
-                  </span>
-                </div>
                 <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
                   <span className="text-purple-400 font-semibold text-sm">
                     Level: {gameState.level}
@@ -703,8 +695,7 @@ export default function TetrisPage() {
                         gameStatus: "waiting",
                         score: 0,
                         level: 1,
-                        lines: 0,
-                        playerName: playerName,
+                        lines: 0
                       });
                     }}
                     disabled={loading}

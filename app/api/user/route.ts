@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     // Check if user already exists
     const { data: existingUser, error: fetchError } = await supabase
       .from("users")
-      .select("*")
+      .select("playerName")
       .eq("walletAddress", walletAddress)
       .maybeSingle();
 
@@ -34,6 +34,8 @@ export async function POST(request: Request) {
       .insert([{ playerName, walletAddress }])
       .select()
       .maybeSingle();
+
+      console.log("newUser: " , newUser);
 
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 });
@@ -62,9 +64,11 @@ export async function GET(request: Request) {
     }
     const { data: user, error } = await supabase
       .from("users")
-      .select("*")
+      .select("playerName")
       .eq("walletAddress", walletAddress)
       .maybeSingle();
+
+      console.log("playerName fetched: ", user);
     if (error) {
       console.log("some error occured fetching user data: ", error);
       return NextResponse.json({ error: error.message }, { status: 500 });

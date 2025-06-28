@@ -49,11 +49,7 @@ export default function Leaderboard({
         }
 
         setLastUpdateTime(Date.now());
-        console.log(
-          "Leaderboard updated:",
-          data.leaderboard?.length || 0,
-          "entries"
-        );
+
       }
     } catch (error) {
       console.error("Failed to load leaderboard:", error);

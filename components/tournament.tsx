@@ -29,7 +29,6 @@ export default function Tournament({
         const data = await response.json();
         setTournament(data.tournament);
         setLastUpdateTime(Date.now());
-        console.log("Snake tournament loaded:", data.tournament);
       } else {
         console.error("Failed to load tournament data");
       }

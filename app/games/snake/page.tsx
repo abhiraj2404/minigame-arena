@@ -19,7 +19,6 @@ interface GameState {
   direction: Position;
   gameStatus: "waiting" | "ready" | "playing" | "paused" | "gameOver";
   score: number;
-  playerName: string;
 }
 
 const BOARD_SIZE = 20;
@@ -34,8 +33,7 @@ export default function SnakePage() {
     food: INITIAL_FOOD,
     direction: INITIAL_DIRECTION,
     gameStatus: "waiting",
-    score: 0,
-    playerName: playerName,
+    score: 0
   });
 
   const [loading, setLoading] = useState(false);
@@ -159,7 +157,7 @@ export default function SnakePage() {
         console.log(
           `Game over - wall collision. Final score: ${prevState.score}`
         );
-        submitScore(prevState.score, prevState.playerName);
+        submitScore(prevState.score, playerName);
         return {
           ...prevState,
           gameStatus: "gameOver",
@@ -174,7 +172,7 @@ export default function SnakePage() {
         console.log(
           `Game over - self collision. Final score: ${prevState.score}`
         );
-        submitScore(prevState.score, prevState.playerName);
+        submitScore(prevState.score, playerName);
         return {
           ...prevState,
           gameStatus: "gameOver",
@@ -215,8 +213,7 @@ export default function SnakePage() {
       food: generateFood(INITIAL_SNAKE),
       direction: INITIAL_DIRECTION,
       gameStatus: "playing",
-      score: 0,
-      playerName: playerName,
+      score: 0
     });
     setMessage("");
     setError("");
@@ -404,7 +401,7 @@ export default function SnakePage() {
               <div className="flex items-center gap-4">
                 <div className="px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg">
                   <span className="text-green-400 font-semibold">
-                    Player: {gameState.playerName}
+                    Player: {playerName}
                   </span>
                 </div>
                 <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
@@ -445,8 +442,7 @@ export default function SnakePage() {
                         food: INITIAL_FOOD,
                         direction: INITIAL_DIRECTION,
                         gameStatus: "waiting",
-                        score: 0,
-                        playerName: playerName,
+                        score: 0
                       });
                     }}
                     disabled={loading}
