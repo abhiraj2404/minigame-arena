@@ -8,6 +8,7 @@ import { usePlayer } from "@/components/player-context";
 import Leaderboard from "@/components/leaderboard";
 import Tournament from "@/components/tournament";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { Spinner } from "@/components/ui/spinner";
 interface Position {
   x: number;
   y: number;
@@ -635,8 +636,11 @@ export default function TetrisPage() {
         {/* Loading Overlay */}
         {loadingOverlay.isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <BlurFade inView className="p-8 rounded-xl shadow-2xl">
-            <span className="text-2xl font-bold text-white animate-pulse">{loadingOverlay.text}</span>
+           <BlurFade inView className="p-8 rounded-xl shadow-2xl">
+            <span className="text-2xl font-bold text-green-400 animate-pulse flex flex-col items-center justify-center">
+              <Spinner className="w-12 h-12 m-2" />
+              {loadingOverlay.text}
+            </span>
           </BlurFade>
         </div>
       )}

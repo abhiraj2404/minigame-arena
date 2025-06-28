@@ -7,12 +7,14 @@ import { useWalletBalance } from "./wallet-provider";
 import { formatSol } from "@/lib/solana-config";
 import { usePlayer } from "./player-context";
 import { MagicCard } from "@/components/magicui/magic-card";
-import '@solana/wallet-adapter-react-ui/styles.css';
+import { Spinner } from "@/components/ui/spinner";
+import "@solana/wallet-adapter-react-ui/styles.css";
+
 
 export default function Navbar() {
   const { connected } = useWallet();
   const { balance, isLoading } = useWalletBalance();
-  const { playerName } = usePlayer();
+  const { playerName, loading: playerNameLoading } = usePlayer();
 
   return (
     <nav className="relative z-100 border-b border-white/10 bg-black/50 backdrop-blur-xl">
@@ -22,7 +24,7 @@ export default function Navbar() {
             🎮 Minigame Arena
           </Link>
           <div className="flex items-center space-x-6">
-            {playerName && (
+            {connected && (
               <MagicCard className="rounded-full px-3 py-2 min-w-[90px] flex items-center justify-center text-green-400 text-sm font-semibold bg-black/60 border border-green-500/30 shadow-md">
                 <div className="flex items-center">
                   <svg
@@ -39,14 +41,28 @@ export default function Navbar() {
                       d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 1115 0v.75a.75.75 0 01-.75.75h-13.5a.75.75 0 01-.75-.75v-.75z"
                     />
                   </svg>
-                  {playerName}
+                  {playerNameLoading ? (
+                    <>
+                      <Spinner className="w-4 h-4 mr-2 inline-block" />
+                      Loading...
+                    </>
+                  ) : (
+                    playerName
+                  )}
                 </div>
               </MagicCard>
             )}
 
             {connected && (
               <MagicCard className="rounded-full px-3 py-2 min-w-[90px] flex items-center justify-center text-green-400 text-sm font-semibold bg-black/60 border border-green-500/30 shadow-md">
-                {isLoading ? "Loading..." : `${formatSol(balance)} SOL`}
+                {isLoading ? (
+                  <>
+                    <Spinner className="w-4 h-4 mr-2 inline-block" />
+                    Loading...
+                  </>
+                ) : (
+                  `${formatSol(balance)} SOL`
+                )}
               </MagicCard>
             )}
 

@@ -10,6 +10,7 @@ import { usePlayer } from "@/components/player-context";
 import Leaderboard from "@/components/leaderboard";
 import Tournament from "@/components/tournament";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { Spinner } from "@/components/ui/spinner";
 
 interface Cell {
   isMine: boolean;
@@ -53,7 +54,7 @@ export default function MinesweeperPage() {
   const [showPayment, setShowPayment] = useState(true);
   const [showStartGameButton, setShowStartGameButton] = useState(false);
 
-  const [loadingOverlay, setLoadingOverlay] = useState({ isLoading: true, text: "" });
+  const [loadingOverlay, setLoadingOverlay] = useState({ isLoading: false, text: "" });
 
   const triggerRefresh = () => {
     setRefreshTrigger((prev) => prev + 1);
@@ -440,7 +441,10 @@ export default function MinesweeperPage() {
       {loadingOverlay.isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <BlurFade inView className="p-8 rounded-xl shadow-2xl">
-            <span className="text-2xl font-bold text-white animate-pulse">{loadingOverlay.text}</span>
+            <span className="text-2xl font-bold text-green-400 animate-pulse flex flex-col items-center justify-center">
+              <Spinner className="w-12 h-12 m-2" />
+              {loadingOverlay.text}
+            </span>
           </BlurFade>
         </div>
       )}
@@ -558,7 +562,7 @@ export default function MinesweeperPage() {
         <div className="lg:col-span-1 space-y-6">
           {/* Tournament Info */}
 
-          <Tournament game="minesweeper" setError={setError} refreshTrigger={refreshTrigger} setLoadingOverlay={handleChildLoading}/>
+          <Tournament game="minesweeper" setError={setError} refreshTrigger={refreshTrigger} setLoadingOverlay={handleChildLoading} />
 
           {/* Leaderboard */}
           <Leaderboard
