@@ -130,6 +130,7 @@ export default function TetrisPage() {
 
     try {
       setLoading(true);
+      setLoadingOverlay({ isLoading: true, text: "Submitting" });
       console.log(`Submitting Tetris score: ${playerName} - ${score}`);
 
       const response = await fetch("/api/tetris/score", {
@@ -167,6 +168,7 @@ export default function TetrisPage() {
       );
     } finally {
       setLoading(false);
+      setLoadingOverlay({ isLoading: false, text: "" });
     }
   };
 

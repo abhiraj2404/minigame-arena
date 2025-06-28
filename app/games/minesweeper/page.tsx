@@ -64,7 +64,7 @@ export default function MinesweeperPage() {
   const submitWin = async (playerName: string, timeTaken: number) => {
     try {
       setLoading(true);
-
+      setLoadingOverlay({ isLoading: true, text: "Submitting" });
       const response = await fetch("/api/minesweeper/score", {
         method: "POST",
         headers: {
@@ -94,6 +94,7 @@ export default function MinesweeperPage() {
       setError(`Failed to submit win: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setLoading(false);
+      setLoadingOverlay({ isLoading: false, text: "" });
     }
   };
 
