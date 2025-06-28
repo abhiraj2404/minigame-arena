@@ -9,6 +9,7 @@ import { usePlayer } from "./player-context";
 import { MagicCard } from "@/components/magicui/magic-card";
 import { Spinner } from "@/components/ui/spinner";
 import "@solana/wallet-adapter-react-ui/styles.css";
+import { GithubIcon, TwitterIcon } from "@/components/icons";
 
 export default function Navbar() {
   const { connected } = useWallet();
@@ -65,9 +66,27 @@ export default function Navbar() {
               </MagicCard>
             )}
 
-            <div>
+            <div className="flex items-center justify-center space-x-5">
               <WalletMultiButton className="bg-black text-4xl" />
             </div>
+            <Link
+              href="https://github.com/abhiraj2404/minigame-arena"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
+              className="text-gray-400 hover:text-gray-200 transition-colors"
+            >
+              <GithubIcon size={24} />
+            </Link>
+            <Link
+              href="https://x.com/abhiraj_2404"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Twitter"
+              className="text-gray-400 hover:text-gray-200 transition-colors"
+            >
+              <TwitterIcon size={24} />
+            </Link>
           </div>
         </div>
       </div>
