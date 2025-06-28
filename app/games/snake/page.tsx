@@ -7,6 +7,7 @@ import GamePayment from "@/components/game-payment";
 import { usePlayer } from "@/components/player-context";
 import Leaderboard from "@/components/leaderboard";
 import Tournament from "@/components/tournament";
+import { BlurFade } from "@/components/magicui/blur-fade";
 
 interface Position {
   x: number;
@@ -48,6 +49,8 @@ export default function SnakePage() {
   const gameLoopRef = useRef<NodeJS.Timeout>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [loadingOverlay, setLoadingOverlay] = useState({ isLoading: true, text: "" });
+
   const triggerRefresh = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
@@ -58,18 +61,19 @@ export default function SnakePage() {
 
     try {
       setLoading(true);
+      setLoadingOverlay({ isLoading: true, text: "Submitting" });
       console.log(`Submitting score: ${playerName} - ${score}`);
 
       const response = await fetch("/api/snake/score", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           playerName,
           score,
-          walletAddress: publicKey ? publicKey.toString() : undefined,
-        }),
+          walletAddress: publicKey ? publicKey.toString() : undefined
+        })
       });
 
       if (response.ok) {
@@ -88,13 +92,10 @@ export default function SnakePage() {
       }
     } catch (error) {
       console.error("Failed to submit score:", error);
-      setError(
-        `Failed to submit score: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      setError(`Failed to submit score: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setLoading(false);
+      setLoadingOverlay({ isLoading: false, text: "" });
     }
   };
 
@@ -105,7 +106,7 @@ export default function SnakePage() {
     triggerRefresh();
     setGameState((gamestate) => ({
       ...gamestate,
-      gameStatus: "ready",
+      gameStatus: "ready"
     }));
   };
 
@@ -124,13 +125,9 @@ export default function SnakePage() {
     do {
       newFood = {
         x: Math.floor(Math.random() * BOARD_SIZE),
-        y: Math.floor(Math.random() * BOARD_SIZE),
+        y: Math.floor(Math.random() * BOARD_SIZE)
       };
-    } while (
-      snake.some(
-        (segment) => segment.x === newFood.x && segment.y === newFood.y
-      )
-    );
+    } while (snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y));
     return newFood;
   }, []);
 
@@ -147,35 +144,24 @@ export default function SnakePage() {
       head.y += prevState.direction.y;
 
       // Check wall collision
-      if (
-        head.x < 0 ||
-        head.x >= BOARD_SIZE ||
-        head.y < 0 ||
-        head.y >= BOARD_SIZE
-      ) {
+      if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
         // Game over
-        console.log(
-          `Game over - wall collision. Final score: ${prevState.score}`
-        );
+        console.log(`Game over - wall collision. Final score: ${prevState.score}`);
         submitScore(prevState.score, playerName);
         return {
           ...prevState,
-          gameStatus: "gameOver",
+          gameStatus: "gameOver"
         };
       }
 
       // Check self collision
-      if (
-        newSnake.some((segment) => segment.x === head.x && segment.y === head.y)
-      ) {
+      if (newSnake.some((segment) => segment.x === head.x && segment.y === head.y)) {
         // Game over
-        console.log(
-          `Game over - self collision. Final score: ${prevState.score}`
-        );
+        console.log(`Game over - self collision. Final score: ${prevState.score}`);
         submitScore(prevState.score, playerName);
         return {
           ...prevState,
-          gameStatus: "gameOver",
+          gameStatus: "gameOver"
         };
       }
 
@@ -193,14 +179,14 @@ export default function SnakePage() {
           ...prevState,
           snake: newSnake,
           food: newFood,
-          score: newScore,
+          score: newScore
         };
       } else {
         // Normal move - remove tail
         newSnake.pop();
         return {
           ...prevState,
-          snake: newSnake,
+          snake: newSnake
         };
       }
     });
@@ -224,7 +210,7 @@ export default function SnakePage() {
   const togglePause = () => {
     setGameState((prev) => ({
       ...prev,
-      gameStatus: prev.gameStatus === "playing" ? "paused" : "playing",
+      gameStatus: prev.gameStatus === "playing" ? "paused" : "playing"
     }));
   };
 
@@ -373,23 +359,26 @@ export default function SnakePage() {
     }
   };
 
+  // Handler to track loading state from children
+  const handleChildLoading = useCallback((isLoading: boolean, text: string) => {
+    setLoadingOverlay({ isLoading, text });
+  }, []);
+
   return (
     <div className="relative max-w-7xl mx-auto space-y-8">
+      {/* Loading Overlay */}
+      {loadingOverlay.isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <BlurFade inView className="p-8 rounded-xl shadow-2xl">
+            <span className="text-2xl font-bold text-white animate-pulse">{loadingOverlay.text}</span>
+          </BlurFade>
+        </div>
+      )}
       <div className="text-center space-y-4">
         <h1 className="text-5xl font-bold text-white">🐍 Snake</h1>
-        <p className="text-gray-300 text-lg">
-          Grow your snake and climb the leaderboard!
-        </p>
-        {message && (
-          <div className="bg-green-900/50 border border-green-500/50 rounded-lg p-3 text-green-200">
-            {message}
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3 text-red-200">
-            {error}
-          </div>
-        )}
+        <p className="text-gray-300 text-lg">Grow your snake and climb the leaderboard!</p>
+        {message && <div className="bg-green-900/50 border border-green-500/50 rounded-lg p-3 text-green-200">{message}</div>}
+        {error && <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3 text-red-200">{error}</div>}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -399,37 +388,22 @@ export default function SnakePage() {
             {/* Game Stats */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-4">
-                <div className="px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg">
-                  <span className="text-green-400 font-semibold">
-                    Player: {playerName}
-                  </span>
-                </div>
                 <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                  <span className="text-purple-400 font-semibold">
-                    Length: {gameState.snake.length}
-                  </span>
+                  <span className="text-purple-400 font-semibold">Length: {gameState.snake.length}</span>
                 </div>
                 <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                  <span className="text-blue-400 font-semibold">
-                    Score: {gameState.score}
-                  </span>
+                  <span className="text-blue-400 font-semibold">Score: {gameState.score}</span>
                 </div>
                 {highScore > 0 && (
                   <div className="px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                    <span className="text-yellow-400 font-semibold">
-                      High: {highScore}
-                    </span>
+                    <span className="text-yellow-400 font-semibold">High: {highScore}</span>
                   </div>
                 )}
               </div>
               <div className="flex gap-2">
                 {showPayment ? (
                   <div className="w-64">
-                    <GamePayment
-                      game="snake"
-                      onPaymentSuccess={handlePaymentSuccess}
-                      onPaymentError={handlePaymentError}
-                    />
+                    <GamePayment game="snake" onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
                   </div>
                 ) : gameState.gameStatus == "gameOver" ? (
                   <ShimmerButton
@@ -450,13 +424,8 @@ export default function SnakePage() {
                   >
                     Play Again
                   </ShimmerButton>
-                ) : gameState.gameStatus === "waiting" ||
-                  gameState.gameStatus === "ready" ? (
-                  <ShimmerButton
-                    onClick={handleStartGameButton}
-                    disabled={loading}
-                    className="text-sm"
-                  >
+                ) : gameState.gameStatus === "waiting" || gameState.gameStatus === "ready" ? (
+                  <ShimmerButton onClick={handleStartGameButton} disabled={loading} className="text-sm">
                     {loading ? "Submitting..." : "Start Game"}
                   </ShimmerButton>
                 ) : (
@@ -516,11 +485,7 @@ export default function SnakePage() {
         {/* Tournament & Leaderboard */}
         <div className="lg:col-span-1 space-y-6">
           {/* Tournament Info */}
-          <Tournament
-            game="snake"
-            setError={setError}
-            refreshTrigger={refreshTrigger}
-          />
+          <Tournament game="snake" setError={setError} refreshTrigger={refreshTrigger} setLoadingOverlay={handleChildLoading} />
 
           {/* Leaderboard */}
           <Leaderboard
@@ -530,6 +495,7 @@ export default function SnakePage() {
             highScore={highScore}
             setHighScore={setHighScore}
             refreshTrigger={refreshTrigger}
+            setLoadingOverlay={handleChildLoading}
           />
         </div>
       </div>

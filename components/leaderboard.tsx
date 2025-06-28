@@ -10,6 +10,7 @@ interface LeaderboardProps {
   highScore: number;
   setHighScore: (score: number) => void;
   refreshTrigger: number;
+  setLoadingOverlay: (isLoading: boolean, text: string) => void;
 }
 
 // Helper to format seconds as mm:ss
@@ -26,6 +27,7 @@ export default function Leaderboard({
   highScore,
   setHighScore,
   refreshTrigger,
+  setLoadingOverlay
 }: LeaderboardProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,20 +38,16 @@ export default function Leaderboard({
   const loadLeaderboard = async (showLoading = false) => {
     try {
       if (showLoading) setLoading(true);
-
       const response = await fetch(`/api/${game}/leaderboard`);
       if (response.ok) {
         const data = await response.json();
         setLeaderboard(data.leaderboard || []);
-
         if (data.leaderboard && data.leaderboard.length > 0) {
           setHighScore(data.leaderboard[0].score);
         } else {
           setHighScore(0);
         }
-
         setLastUpdateTime(Date.now());
-
       }
     } catch (error) {
       console.error("Failed to load leaderboard:", error);
@@ -67,8 +65,13 @@ export default function Leaderboard({
 
   // Auto-refresh leaderboard
   useEffect(() => {
-    loadLeaderboard(true);
+    const loadFirstTime = async () => {
+      setLoadingOverlay(true, "Loading");
+      await loadLeaderboard(true);
+      setLoadingOverlay(false, "");
+    };
 
+    loadFirstTime();
     const startAutoRefresh = () => {
       leaderboardUpdateRef.current = setInterval(() => {
         loadLeaderboard();
@@ -89,9 +92,7 @@ export default function Leaderboard({
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-white">🏆 Leaderboard</h3>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">
-            {lastUpdateTime > 0 && formatTimeAgo(lastUpdateTime)}
-          </span>
+          <span className="text-xs text-gray-400">{lastUpdateTime > 0 && formatTimeAgo(lastUpdateTime)}</span>
           <button
             onClick={() => {
               loadLeaderboard(true);
@@ -100,12 +101,7 @@ export default function Leaderboard({
             className="text-green-400 hover:text-green-300 transition-colors disabled:opacity-50"
             title="Refresh leaderboard"
           >
-            <svg
-              className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -123,8 +119,7 @@ export default function Leaderboard({
             <div
               key={entry.id}
               className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-300 ${
-                entry.playerName === gameState.playerName &&
-                gameState.gameStatus === "gameOver"
+                entry.playerName === gameState.playerName && gameState.gameStatus === "gameOver"
                   ? "bg-green-500/20 border-green-500/50 ring-2 ring-green-500/30"
                   : index === 0
                   ? "bg-yellow-500/10 border-yellow-500/30"
@@ -150,25 +145,15 @@ export default function Leaderboard({
                   {index + 1}
                 </div>
                 <div>
-                  <p className="text-white font-semibold text-sm">
-                    {entry.playerName}
-                  </p>
-                  {entry.walletAddress && (
-                    <p className="text-gray-500 text-xs">
-                      {formatWalletAddress(entry.walletAddress)}
-                    </p>
-                  )}
-                  <p className="text-gray-400 text-xs">
-                    {formatTimeAgo(entry.timestamp)}
-                  </p>
+                  <p className="text-white font-semibold text-sm">{entry.playerName}</p>
+                  {entry.walletAddress && <p className="text-gray-500 text-xs">{formatWalletAddress(entry.walletAddress)}</p>}
+                  <p className="text-gray-400 text-xs">{formatTimeAgo(entry.timestamp)}</p>
                 </div>
               </div>
               <div className="text-right">
                 {game === "minesweeper" ? (
                   <>
-                    <p className="text-green-400 font-bold">
-                      {formatTime(entry.score)}
-                    </p>
+                    <p className="text-green-400 font-bold">{formatTime(entry.score)}</p>
                     <p className="text-gray-500 text-xs">min</p>
                   </>
                 ) : (
@@ -191,13 +176,8 @@ export default function Leaderboard({
       {gameState.score > 0 && gameState.gameStatus === "gameOver" && (
         <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
           <p className="text-blue-400 text-sm text-center">
-            Your final score:{" "}
-            <span className="font-bold">{gameState.score}</span>
-            {gameState.score > highScore && (
-              <span className="block text-yellow-400 font-bold">
-                🎉 New High Score!
-              </span>
-            )}
+            Your final score: <span className="font-bold">{gameState.score}</span>
+            {gameState.score > highScore && <span className="block text-yellow-400 font-bold">🎉 New High Score!</span>}
           </p>
         </div>
       )}

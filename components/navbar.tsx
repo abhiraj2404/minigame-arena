@@ -7,6 +7,7 @@ import { useWalletBalance } from "./wallet-provider";
 import { formatSol } from "@/lib/solana-config";
 import { usePlayer } from "./player-context";
 import { MagicCard } from "@/components/magicui/magic-card";
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 export default function Navbar() {
   const { connected } = useWallet();
@@ -50,7 +51,7 @@ export default function Navbar() {
             )}
 
             <div>
-              <WalletMultiButton />
+              <WalletMultiButton className="bg-black text-4xl" />
             </div>
           </div>
         </div>

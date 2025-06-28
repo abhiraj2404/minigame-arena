@@ -7,6 +7,7 @@ import GamePayment from "@/components/game-payment";
 import { usePlayer } from "@/components/player-context";
 import Leaderboard from "@/components/leaderboard";
 import Tournament from "@/components/tournament";
+import { BlurFade } from "@/components/magicui/blur-fade";
 interface Position {
   x: number;
   y: number;
@@ -115,6 +116,8 @@ export default function TetrisPage() {
   const gameLoopRef = useRef<NodeJS.Timeout>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nextPieceCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [loadingOverlay, setLoadingOverlay] = useState({ isLoading: true, text: "" });
 
   const triggerRefresh = () => {
     setRefreshTrigger((prev) => prev + 1);
@@ -622,8 +625,21 @@ export default function TetrisPage() {
     }
   };
 
+    // Handler to track loading state from children
+    const handleChildLoading = useCallback((isLoading: boolean, text: string) => {
+      setLoadingOverlay({ isLoading, text });
+    }, []);
+
   return (
     <div className="relative max-w-7xl mx-auto space-y-8">
+        {/* Loading Overlay */}
+        {loadingOverlay.isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <BlurFade inView className="p-8 rounded-xl shadow-2xl">
+            <span className="text-2xl font-bold text-white animate-pulse">{loadingOverlay.text}</span>
+          </BlurFade>
+        </div>
+      )}
       <div className="text-center space-y-4">
         <h1 className="text-5xl font-bold text-white">🧩 Tetris</h1>
         <p className="text-gray-300 text-lg">
@@ -791,6 +807,7 @@ export default function TetrisPage() {
             game="tetris"
             setError={setError}
             refreshTrigger={refreshTrigger}
+            setLoadingOverlay={handleChildLoading}
           />
 
           {/* Leaderboard */}
@@ -801,6 +818,7 @@ export default function TetrisPage() {
             highScore={highScore}
             setHighScore={setHighScore}
             refreshTrigger={refreshTrigger}
+            setLoadingOverlay={handleChildLoading}
           />
         </div>
       </div>

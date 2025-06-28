@@ -2,13 +2,14 @@
 
 import type React from "react";
 
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import GamePayment from "@/components/game-payment";
 import { usePlayer } from "@/components/player-context";
 import Leaderboard from "@/components/leaderboard";
 import Tournament from "@/components/tournament";
+import { BlurFade } from "@/components/magicui/blur-fade";
 
 interface Cell {
   isMine: boolean;
@@ -51,6 +52,8 @@ export default function MinesweeperPage() {
   const { publicKey } = useWallet();
   const [showPayment, setShowPayment] = useState(true);
   const [showStartGameButton, setShowStartGameButton] = useState(false);
+
+  const [loadingOverlay, setLoadingOverlay] = useState({ isLoading: true, text: "" });
 
   const triggerRefresh = () => {
     setRefreshTrigger((prev) => prev + 1);
@@ -426,8 +429,21 @@ export default function MinesweeperPage() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Handler to track loading state from children
+  const handleChildLoading = useCallback((isLoading: boolean, text: string) => {
+    setLoadingOverlay({ isLoading, text });
+  }, []);
+
   return (
     <div className="relative max-w-7xl mx-auto space-y-8">
+      {/* Loading Overlay */}
+      {loadingOverlay.isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <BlurFade inView className="p-8 rounded-xl shadow-2xl">
+            <span className="text-2xl font-bold text-white animate-pulse">{loadingOverlay.text}</span>
+          </BlurFade>
+        </div>
+      )}
       <div className="text-center space-y-4">
         <h1 className="text-5xl font-bold text-white">💣 Minesweeper</h1>
         <p className="text-gray-300 text-lg">Clear the minefield and climb the leaderboard!</p>
@@ -542,7 +558,7 @@ export default function MinesweeperPage() {
         <div className="lg:col-span-1 space-y-6">
           {/* Tournament Info */}
 
-          <Tournament game="minesweeper" setError={setError} refreshTrigger={refreshTrigger} />
+          <Tournament game="minesweeper" setError={setError} refreshTrigger={refreshTrigger} setLoadingOverlay={handleChildLoading}/>
 
           {/* Leaderboard */}
           <Leaderboard
@@ -552,6 +568,7 @@ export default function MinesweeperPage() {
             highScore={highScore}
             setHighScore={setHighScore}
             refreshTrigger={refreshTrigger}
+            setLoadingOverlay={handleChildLoading}
           />
         </div>
       </div>

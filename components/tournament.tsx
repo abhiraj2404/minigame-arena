@@ -7,13 +7,10 @@ interface TournamentProps {
   game: string;
   setError: (error: string) => void;
   refreshTrigger: number;
+  setLoadingOverlay: (isLoading: boolean, text: string) => void;
 }
 
-export default function Tournament({
-  game,
-  setError,
-  refreshTrigger,
-}: TournamentProps) {
+export default function Tournament({ game, setError, refreshTrigger, setLoadingOverlay }: TournamentProps) {
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<number>(0);
@@ -47,7 +44,13 @@ export default function Tournament({
   }, [refreshTrigger]);
 
   useEffect(() => {
-    loadTournament(true);
+    const loadFirstTime = async () => {
+      setLoadingOverlay(true, "Loading");
+      await loadTournament(true);
+      setLoadingOverlay(false, "");
+    };
+
+    loadFirstTime();
 
     // Auto-refresh tournament data every 30 seconds
     const startTournamentRefresh = () => {
@@ -72,9 +75,7 @@ export default function Tournament({
         <h3 className="text-xl font-bold text-white">🏆 Current Tournament</h3>
         {/* sync button  */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">
-            {lastUpdateTime > 0 && formatTimeAgo(lastUpdateTime)}
-          </span>
+          <span className="text-xs text-gray-400">{lastUpdateTime > 0 && formatTimeAgo(lastUpdateTime)}</span>
           <button
             onClick={() => {
               loadTournament(true);
@@ -83,12 +84,7 @@ export default function Tournament({
             className="text-green-400 hover:text-green-300 transition-colors disabled:opacity-50"
             title="Refresh leaderboard"
           >
-            <svg
-              className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -103,27 +99,19 @@ export default function Tournament({
         <div className="space-y-3">
           <div className="flex justify-between">
             <span className="text-gray-400">Entry Fee:</span>
-            <span className="text-green-400 font-bold">
-              {formatSol(tournament.entryFee)} SOL
-            </span>
+            <span className="text-green-400 font-bold">{formatSol(tournament.entryFee)} SOL</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Prize Pool:</span>
-            <span className="text-blue-400 font-bold">
-              {formatSol(tournament.prizePool)} SOL
-            </span>
+            <span className="text-blue-400 font-bold">{formatSol(tournament.prizePool)} SOL</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Participants:</span>
-            <span className="text-purple-400 font-bold">
-              {tournament.participants}
-            </span>
+            <span className="text-purple-400 font-bold">{tournament.participants}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Time Left:</span>
-            <span className="text-yellow-400 font-bold">
-              {tournament.status}
-            </span>
+            <span className="text-yellow-400 font-bold">{tournament.status}</span>
           </div>
         </div>
       )}
