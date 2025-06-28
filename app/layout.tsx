@@ -9,6 +9,14 @@ import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const metadata: Metadata = {
+  title: "Minigame Arena",
+  description: "Play mini games and win SOL",
+  icons: {
+    icon: "/favicon.svg"
+  }
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
