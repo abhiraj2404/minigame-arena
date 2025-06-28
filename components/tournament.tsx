@@ -105,10 +105,7 @@ export default function Tournament({ game, setError, refreshTrigger, setLoadingO
             <span className="text-gray-400">Prize Pool:</span>
             <span className="text-blue-400 font-bold">{formatSol(tournament.prizePool)} SOL</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">Participants:</span>
-            <span className="text-purple-400 font-bold">{tournament.participants}</span>
-          </div>
+        
           <div className="flex justify-between">
             <span className="text-gray-400">Time Left:</span>
             <span className="text-yellow-400 font-bold">{tournament.status}</span>
