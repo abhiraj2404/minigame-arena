@@ -8,8 +8,7 @@ const games = [
   {
     id: "minesweeper",
     title: "Minesweeper",
-    description:
-      "Classic mine detection game with modern multiplayer features and SOL rewards. Test your logic and luck!",
+    description: "Classic mine detection game with modern features and SOL rewards. Test your logic and luck!",
     icon: "💣",
     status: "available" as const,
     cost: `${GAME_FEES.minesweeper} SOL`,
@@ -17,25 +16,17 @@ const games = [
     preview: (
       <div className="grid grid-cols-6 gap-1 p-4">
         {Array.from({ length: 36 }).map((_, i) => (
-          <div
-            key={i}
-            className="w-4 h-4 bg-gray-700 border border-gray-600 rounded-sm flex items-center justify-center text-xs"
-          >
-            {Math.random() > 0.8
-              ? "💣"
-              : Math.random() > 0.6
-              ? Math.floor(Math.random() * 4) + 1
-              : ""}
+          <div key={i} className="w-4 h-4 bg-gray-700 border border-gray-600 rounded-sm flex items-center justify-center text-xs">
+            {Math.random() > 0.8 ? "💣" : Math.random() > 0.6 ? Math.floor(Math.random() * 4) + 1 : ""}
           </div>
         ))}
       </div>
-    ),
+    )
   },
   {
     id: "tetris",
     title: "Tetris",
-    description:
-      "Stack blocks and clear lines in this timeless puzzle game with competitive tournaments.",
+    description: "Stack blocks and clear lines in this timeless puzzle game with competitive tournaments.",
     icon: "🧩",
     status: "available" as const, // Change from "coming-soon" to "available"
     cost: `${GAME_FEES.tetris} SOL`,
@@ -47,25 +38,18 @@ const games = [
             key={i}
             className={`w-3 h-3 rounded-sm ${
               Math.random() > 0.7
-                ? [
-                    "bg-blue-500",
-                    "bg-green-500",
-                    "bg-red-500",
-                    "bg-yellow-500",
-                    "bg-purple-500",
-                  ][Math.floor(Math.random() * 5)]
+                ? ["bg-blue-500", "bg-green-500", "bg-red-500", "bg-yellow-500", "bg-purple-500"][Math.floor(Math.random() * 5)]
                 : "bg-gray-800"
             }`}
           />
         ))}
       </div>
-    ),
+    )
   },
   {
     id: "snake",
     title: "Snake",
-    description:
-      "Grow your snake and avoid the walls in this classic arcade game with modern twists and crypto rewards.",
+    description: "Grow your snake and avoid the walls in this classic arcade game to win crypto rewards.",
     icon: "🐍",
     status: "available" as const,
     cost: `${GAME_FEES.snake} SOL`,
@@ -79,8 +63,8 @@ const games = [
           <div className="absolute top-16 right-12 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
         </div>
       </div>
-    ),
-  },
+    )
+  }
 ];
 
 export default function HomePage() {
@@ -99,13 +83,12 @@ export default function HomePage() {
         </h1>
 
         <p className="relative text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-          Challenge yourself with classic games, compete with players worldwide,
-          and win SOL rewards in our decentralized gaming platform.
+          Challenge yourself with classic games, compete with players worldwide, and win SOL rewards in our decentralized gaming platform.
         </p>
       </div>
 
       {/* Games Grid */}
-      <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-10 max-w-7xl mx-auto">
         {games.map((game) => (
           <GameCard key={game.id} {...game} />
         ))}
@@ -121,27 +104,21 @@ export default function HomePage() {
                 <span className="text-2xl">💰</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Pay to Play</h3>
-              <p className="text-gray-400">
-                Use SOL to enter games and tournaments
-              </p>
+              <p className="text-gray-400">Use SOL to enter games and tournaments</p>
             </div>
             <div className="space-y-4">
               <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto">
                 <span className="text-2xl">🎯</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Compete</h3>
-              <p className="text-gray-400">
-                Challenge players from around the world
-              </p>
+              <p className="text-gray-400">Challenge players from around the world</p>
             </div>
             <div className="space-y-4">
               <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto">
                 <span className="text-2xl">🏆</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Win Rewards</h3>
-              <p className="text-gray-400">
-                Earn SOL for victories and achievements
-              </p>
+              <p className="text-gray-400">Earn SOL for victories and achievements</p>
             </div>
           </div>
         </div>

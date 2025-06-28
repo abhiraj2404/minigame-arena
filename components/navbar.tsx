@@ -10,14 +10,13 @@ import { MagicCard } from "@/components/magicui/magic-card";
 import { Spinner } from "@/components/ui/spinner";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
-
 export default function Navbar() {
   const { connected } = useWallet();
   const { balance, isLoading } = useWalletBalance();
   const { playerName, loading: playerNameLoading } = usePlayer();
 
   return (
-    <nav className="relative z-100 border-b border-white/10 bg-black/50 backdrop-blur-xl">
+    <nav className="relative z-100 border-b mx-6 border-white/10 bg-black/50 backdrop-blur-xl">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-white hover:text-green-400 transition-colors">
