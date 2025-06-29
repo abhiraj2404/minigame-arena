@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import {
-  Connection,
-  PublicKey,
-  Transaction,
-  SystemProgram,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from "@gorbagana/web3.js";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { endpoint, formatSol } from "@/lib/solana-config";
 import { GAME_FEES } from "@/lib/constants";
@@ -22,11 +16,7 @@ interface GamePaymentProps {
 
 const DEVELOPMENT_MODE = process.env.NEXT_PUBLIC_ENVIRONMENT === "development";
 
-export default function GamePayment({
-  game,
-  onPaymentSuccess,
-  onPaymentError,
-}: GamePaymentProps) {
+export default function GamePayment({ game, onPaymentSuccess, onPaymentError }: GamePaymentProps) {
   const { publicKey, sendTransaction } = useWallet();
   const { balance, refreshBalance } = useWalletBalance();
   const [loading, setLoading] = useState(false);
@@ -53,9 +43,7 @@ export default function GamePayment({
 
       // Check if user has enough balance
       if (balance < entryFee) {
-        throw new Error(
-          `Insufficient balance. You need at least ${formatSol(entryFee)} SOL`
-        );
+        throw new Error(`Insufficient balance. You need at least ${formatSol(entryFee)} SOL`);
       }
 
       // Fetch tournament data to get the public key
@@ -79,31 +67,40 @@ export default function GamePayment({
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: tournamentPublicKey,
-          lamports: entryFee * LAMPORTS_PER_SOL,
+          lamports: entryFee * LAMPORTS_PER_SOL
         })
       );
 
       // Set recent blockhash and fee payer
-      const { blockhash } = await connection.getLatestBlockhash();
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
       // Send transaction
       const signature = await sendTransaction(transaction, connection);
+      console.log("transaction sent: ", signature);
 
       // Wait for confirmation
-      await connection.confirmTransaction(signature, "confirmed");
+      const confirmationStrategy = {
+        signature,
+        blockhash,
+        lastValidBlockHeight
+      };
+
+      const txDetails = await connection.getConfirmedTransaction(signature, "confirmed");
+      console.log("txn details fetched: ", txDetails);
+      console.log(txDetails?.meta?.err ? "Failed" : "Success");
 
       // Register entry with backend
       const entryResponse = await fetch("/api/tournaments/entry", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           game,
-          playerWallet: publicKey.toString(),
-        }),
+          playerWallet: publicKey.toString()
+        })
       });
 
       if (!entryResponse.ok) {
@@ -125,11 +122,7 @@ export default function GamePayment({
 
   return (
     <div className="space-y-4">
-      <ShimmerButton
-        onClick={handlePayment}
-        disabled={loading || !publicKey}
-        className="w-full"
-      >
+      <ShimmerButton onClick={handlePayment} disabled={loading || !publicKey} className="w-full">
         {loading
           ? "Processing..."
           : !publicKey

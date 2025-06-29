@@ -1,13 +1,10 @@
-import {
-  clusterApiUrl,
-  type PublicKey,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import { clusterApiUrl, type PublicKey, LAMPORTS_PER_SOL } from "@gorbagana/web3.js";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 
 // Configure the network and RPC endpoint
-export const network = WalletAdapterNetwork.Devnet; // Change to Mainnet for production
-export const endpoint = clusterApiUrl(network);
+// export const network = WalletAdapterNetwork.Devnet; // Change to Mainnet for production
+// export const endpoint = clusterApiUrl(network);
+export const endpoint = "https://rpc.gorbagana.wtf";
 
 // Convert SOL to lamports
 export const solToLamports = (sol: number): number => {
@@ -25,9 +22,7 @@ export const formatSol = (sol: number): string => {
 };
 
 // Format public key for display (first 4 + last 4 characters)
-export const formatPublicKey = (
-  publicKey: PublicKey | string | null
-): string => {
+export const formatPublicKey = (publicKey: PublicKey | string | null): string => {
   if (!publicKey) return "";
   const key = typeof publicKey === "string" ? publicKey : publicKey.toString();
   return `${key.slice(0, 4)}...${key.slice(-4)}`;

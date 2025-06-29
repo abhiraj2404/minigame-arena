@@ -1,4 +1,4 @@
-import { Keypair } from "@solana/web3.js";
+import { Keypair } from "@gorbagana/web3.js";
 import bs58 from "bs58";
 
 const keypair = Keypair.generate();

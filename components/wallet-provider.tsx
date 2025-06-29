@@ -1,25 +1,12 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
-import {
-  ConnectionProvider,
-  WalletProvider,
-  useWallet,
-} from "@solana/wallet-adapter-react";
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { ConnectionProvider, WalletProvider, useWallet } from "@solana/wallet-adapter-react";
+import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { endpoint } from "@/lib/solana-config";
 import { Connection, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { BackpackWalletAdapter } from "@solana/wallet-adapter-backpack";
 
 // Import wallet adapter CSS
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -33,7 +20,7 @@ interface WalletContextState {
 const WalletBalanceContext = createContext<WalletContextState>({
   balance: 0,
   isLoading: false,
-  refreshBalance: async () => {},
+  refreshBalance: async () => {}
 });
 
 export const useWalletBalance = () => useContext(WalletBalanceContext);
@@ -70,21 +57,12 @@ export function WalletBalanceProvider({ children }: { children: ReactNode }) {
     }
   }, [connected, publicKey]);
 
-  return (
-    <WalletBalanceContext.Provider
-      value={{ balance, isLoading, refreshBalance }}
-    >
-      {children}
-    </WalletBalanceContext.Provider>
-  );
+  return <WalletBalanceContext.Provider value={{ balance, isLoading, refreshBalance }}>{children}</WalletBalanceContext.Provider>;
 }
 
 export function SolanaWalletProvider({ children }: { children: ReactNode }) {
   // Set up supported wallets
-  const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
-    []
-  );
+  const wallets = useMemo(() => [new PhantomWalletAdapter(), new SolflareWalletAdapter(), new BackpackWalletAdapter()], []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
