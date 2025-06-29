@@ -437,7 +437,7 @@ export default function MinesweeperPage() {
   }, []);
 
   return (
-    <div className="relative max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       {/* Loading Overlay */}
       {loadingOverlay.isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
@@ -449,7 +449,7 @@ export default function MinesweeperPage() {
           </BlurFade>
         </div>
       )}
-      <div className="text-center space-y-4">
+      <div className="relative w-fit mx-auto text-center space-y-4">
         <h1 className="text-5xl font-bold text-white">💣 Minesweeper</h1>
         <p className="text-gray-300 text-lg">Clear the minefield and climb the leaderboard!</p>
         {message && <div className="bg-green-900/50 border border-green-500/50 rounded-lg p-3 text-green-200">{message}</div>}

@@ -118,7 +118,7 @@ export default function HomePage() {
                 <span className="text-2xl">🏆</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Win Rewards</h3>
-              <p className="text-gray-400">Earn SOL for victories and achievements</p>
+              <p className="text-gray-400">Top leaderboard players win GOR from the prize pool</p>
             </div>
           </div>
         </div>

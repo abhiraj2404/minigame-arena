@@ -88,4 +88,4 @@ A decentralized gaming platform built on Solana where players can compete in cla
 
 ---
 
-Built with ❤️ by [Abhiraj](https://www.abhiraj0x.me)
+Built with ❤️ by [Abhiraj](https://x.com/abhiraj_2404)

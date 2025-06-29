@@ -366,11 +366,11 @@ export default function SnakePage() {
   }, []);
 
   return (
-    <div className="relative max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       {/* Loading Overlay */}
       {loadingOverlay.isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-           <BlurFade inView className="p-8 rounded-xl shadow-2xl">
+          <BlurFade inView className="p-8 rounded-xl shadow-2xl">
             <span className="text-2xl font-bold text-green-400 animate-pulse flex flex-col items-center justify-center">
               <Spinner className="w-12 h-12 m-2" />
               {loadingOverlay.text}
@@ -378,9 +378,9 @@ export default function SnakePage() {
           </BlurFade>
         </div>
       )}
-      <div className="text-center space-y-4">
-        <h1 className="text-5xl font-bold text-white">🐍 Snake</h1>
-        <p className="text-gray-300 text-lg">Grow your snake and climb the leaderboard!</p>
+      <div className="relative w-fit mx-auto text-center space-y-4">
+        <h1 className=" text-5xl font-bold w-fit mx-auto text-white">🐍 Snake</h1>
+        <p className=" text-gray-300 text-lg">Grow your snake and climb the leaderboard!</p>
         {message && <div className="bg-green-900/50 border border-green-500/50 rounded-lg p-3 text-green-200">{message}</div>}
         {error && <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3 text-red-200">{error}</div>}
       </div>

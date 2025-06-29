@@ -10,6 +10,8 @@ import { MagicCard } from "@/components/magicui/magic-card";
 import { Spinner } from "@/components/ui/spinner";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import { GithubIcon, TwitterIcon } from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import { Globe } from "lucide-react";
 
 export default function Navbar() {
   const { connected } = useWallet();
@@ -65,6 +67,35 @@ export default function Navbar() {
                 )}
               </MagicCard>
             )}
+
+            <div className="relative group flex items-center">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="rounded-full px-3 py-1 text-sm font-semibold border border-green-500/30 bg-black/60 text-green-400 shadow-md hover:bg-green-950/60 flex items-center"
+                style={{ minWidth: 0 }}
+              >
+                <Globe className="h-4 w-4 text-gray-400 mr-1" />
+                Solana Devnet
+              </Button>
+              <div className="absolute left-1/2 top-full z-50 mt-[0.5] min-w-[220px] -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 scale-95 group-hover:scale-100 bg-popover text-popover-foreground border rounded-md shadow-md">
+                <div className="flex flex-col p-2">
+                  <div className="flex flex-col items-start cursor-pointer select-text px-2 py-1.5 rounded hover:bg-accent">
+                    <span className="text-xs text-muted-foreground mb-1">RPC URL</span>
+                    <span className="font-mono text-green-400 text-xs break-all">api.devnet.solana.com</span>
+                  </div>
+                  <div className="my-1 border-t border-muted" />
+                  <a
+                    href="https://faucet.solana.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full px-2 py-1.5 rounded text-green-400 font-semibold text-sm hover:bg-accent"
+                  >
+                    Faucet
+                  </a>
+                </div>
+              </div>
+            </div>
 
             <div className="flex items-center justify-center space-x-5">
               <WalletMultiButton className="bg-black text-4xl" />

@@ -634,7 +634,7 @@ export default function TetrisPage() {
     }, []);
 
   return (
-    <div className="relative max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
         {/* Loading Overlay */}
         {loadingOverlay.isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
@@ -646,7 +646,7 @@ export default function TetrisPage() {
           </BlurFade>
         </div>
       )}
-      <div className="text-center space-y-4">
+      <div className="relative w-fit mx-auto text-center space-y-4">
         <h1 className="text-5xl font-bold text-white">🧩 Tetris</h1>
         <p className="text-gray-300 text-lg">
           Stack blocks and clear lines to climb the leaderboard!
