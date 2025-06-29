@@ -130,7 +130,7 @@ export async function getAllTournaments(): Promise<Tournament[]> {
   return data || [];
 }
 
-// Send SOL from a tournament keypair to a winner
+// Send GOR from a tournament keypair to a winner
 export async function sendPrizeToWinner({
   fromSecretKey,
   toPublicKey,

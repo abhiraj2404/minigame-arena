@@ -61,7 +61,7 @@ export default function Navbar() {
                     Loading...
                   </>
                 ) : (
-                  `${formatSol(balance)} SOL`
+                  `${formatSol(balance)} GOR`
                 )}
               </MagicCard>
             )}

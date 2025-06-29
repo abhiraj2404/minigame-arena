@@ -6,17 +6,17 @@ import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 // export const endpoint = clusterApiUrl(network);
 export const endpoint = "https://rpc.gorbagana.wtf";
 
-// Convert SOL to lamports
+// Convert GOR to lamports
 export const solToLamports = (sol: number): number => {
   return Math.floor(sol * LAMPORTS_PER_SOL);
 };
 
-// Convert lamports to SOL
+// Convert lamports to GOR
 export const lamportsToSol = (lamports: number): number => {
   return lamports / LAMPORTS_PER_SOL;
 };
 
-// Format SOL amount with 2 decimal places
+// Format GOR amount with 2 decimal places
 export const formatSol = (sol: number): string => {
   return sol.toFixed(3);
 };

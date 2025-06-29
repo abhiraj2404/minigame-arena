@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Minigame Arena",
-  description: "Play mini games and win SOL",
+  description: "Play mini games and win GOR",
   icons: {
     icon: "/favicon.svg"
   }

@@ -1,6 +1,6 @@
 # 🎮 Minigame Arena
 
-A decentralized gaming platform built on Solana where players can compete in classic games and earn SOL rewards.
+A decentralized gaming platform built on Solana where players can compete in classic games and earn GOR rewards.
 
 ## 🌟 Features
 
@@ -14,7 +14,7 @@ A decentralized gaming platform built on Solana where players can compete in cla
 - **Blockchain Features**
 
   - Play-to-earn mechanics
-  - SOL rewards for victories
+  - GOR rewards for victories
   - Secure wallet integration
   - Transparent transactions
 
@@ -47,21 +47,21 @@ A decentralized gaming platform built on Solana where players can compete in cla
 
 - Classic mine detection game
 - Multiplayer support
-- Entry cost: 0.001 SOL
+- Entry cost: 0.001 GOR
 - Features: Logic-based gameplay, strategy elements
 
 ### Tetris
 
 - Classic block-stacking puzzle
 - Competitive multiplayer modes
-- Entry cost: 0.015 SOL
+- Entry cost: 0.015 GOR
 - Features: Tournament support, real-time competition
 
 ### Snake
 
 - Classic arcade game
 - Modern multiplayer features
-- Entry cost: 0.008 SOL
+- Entry cost: 0.008 GOR
 - Features: Survival gameplay, competitive leaderboards
 
 ## 💰 How It Works
@@ -69,7 +69,7 @@ A decentralized gaming platform built on Solana where players can compete in cla
 1. **Connect Wallet**
 
    - Connect your Solana wallet (Phantom, Solflare, etc.)
-   - Ensure you have sufficient SOL for game entry
+   - Ensure you have sufficient GOR for game entry
 
 2. **Choose a Game**
 
@@ -78,12 +78,12 @@ A decentralized gaming platform built on Solana where players can compete in cla
 
 3. **Play & Compete**
 
-   - Enter the game with required SOL
+   - Enter the game with required GOR
    - Compete against other players
    - Climb the leaderboards
 
 4. **Win Rewards**
-   - Earn SOL for victories
+   - Earn GOR for victories
    - Track your earnings in your wallet
 
 ---

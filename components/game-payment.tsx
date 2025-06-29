@@ -43,7 +43,7 @@ export default function GamePayment({ game, onPaymentSuccess, onPaymentError }: 
 
       // Check if user has enough balance
       if (balance < entryFee) {
-        throw new Error(`Insufficient balance. You need at least ${formatSol(entryFee)} SOL`);
+        throw new Error(`Insufficient balance. You need at least ${formatSol(entryFee)} GOR`);
       }
 
       // Fetch tournament data to get the public key
@@ -129,7 +129,7 @@ export default function GamePayment({ game, onPaymentSuccess, onPaymentError }: 
           ? "Connect Wallet to Play"
           : DEVELOPMENT_MODE
           ? "Start Game (Dev Mode)"
-          : `Pay ${entryFee} SOL to Play`}
+          : `Pay ${entryFee} GOR to Play`}
       </ShimmerButton>
     </div>
   );

@@ -8,10 +8,10 @@ const games = [
   {
     id: "minesweeper",
     title: "Minesweeper",
-    description: "Classic mine detection game with modern features and SOL rewards. Test your logic and luck!",
+    description: "Classic mine detection game with modern features and GOR rewards. Test your logic and luck!",
     icon: "💣",
     status: "available" as const,
-    cost: `${GAME_FEES.minesweeper} SOL`,
+    cost: `${GAME_FEES.minesweeper} GOR`,
     tags: ["Logic", "Strategy", "Classic"],
     preview: (
       <div className="grid grid-cols-6 gap-1 p-4">
@@ -29,7 +29,7 @@ const games = [
     description: "Stack blocks and clear lines in this timeless puzzle game with competitive tournaments.",
     icon: "🧩",
     status: "available" as const, // Change from "coming-soon" to "available"
-    cost: `${GAME_FEES.tetris} SOL`,
+    cost: `${GAME_FEES.tetris} GOR`,
     tags: ["Puzzle", "Speed", "Multiplayer"],
     preview: (
       <div className="grid grid-cols-10 gap-px p-4">
@@ -52,7 +52,7 @@ const games = [
     description: "Grow your snake and avoid the walls in this classic arcade game to win crypto rewards.",
     icon: "🐍",
     status: "available" as const,
-    cost: `${GAME_FEES.snake} SOL`,
+    cost: `${GAME_FEES.snake} GOR`,
     tags: ["Arcade", "Survival", "Classic"],
     preview: (
       <div className="relative w-full h-full bg-gray-800 rounded-lg p-4">
@@ -83,7 +83,7 @@ export default function HomePage() {
         </h1>
 
         <p className="relative text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-          Challenge yourself with classic games, compete with players worldwide, and win SOL rewards in our decentralized gaming platform.
+          Challenge yourself with classic games, compete with players worldwide, and win GOR rewards in our decentralized gaming platform.
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export default function HomePage() {
                 <span className="text-2xl">💰</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Pay to Play</h3>
-              <p className="text-gray-400">Use SOL to enter games and tournaments</p>
+              <p className="text-gray-400">Use GOR to enter games and tournaments</p>
             </div>
             <div className="space-y-4">
               <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto">
@@ -118,7 +118,7 @@ export default function HomePage() {
                 <span className="text-2xl">🏆</span>
               </div>
               <h3 className="text-xl font-semibold text-white">Win Rewards</h3>
-              <p className="text-gray-400">Earn SOL for victories and achievements</p>
+              <p className="text-gray-400">Earn GOR for victories and achievements</p>
             </div>
           </div>
         </div>

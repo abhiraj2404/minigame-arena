@@ -99,13 +99,13 @@ export default function Tournament({ game, setError, refreshTrigger, setLoadingO
         <div className="space-y-3">
           <div className="flex justify-between">
             <span className="text-gray-400">Entry Fee:</span>
-            <span className="text-green-400 font-bold">{formatSol(tournament.entryFee)} SOL</span>
+            <span className="text-green-400 font-bold">{formatSol(tournament.entryFee)} GOR</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Prize Pool:</span>
-            <span className="text-blue-400 font-bold">{formatSol(tournament.prizePool)} SOL</span>
+            <span className="text-blue-400 font-bold">{formatSol(tournament.prizePool)} GOR</span>
           </div>
-        
+
           <div className="flex justify-between">
             <span className="text-gray-400">Time Left:</span>
             <span className="text-yellow-400 font-bold">{tournament.status}</span>
