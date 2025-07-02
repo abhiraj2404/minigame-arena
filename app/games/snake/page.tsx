@@ -149,7 +149,6 @@ export default function SnakePage() {
       // Check wall collision
       if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
         // Game over
-        console.log(`Game over - wall collision. Final score: ${prevState.score}`);
         submitScore(prevState.score, playerName);
         return {
           ...prevState,

@@ -310,7 +310,6 @@ export default function TetrisPage() {
   // Move piece
   const movePiece = useCallback(
     (direction: "left" | "right" | "down" | "rotate") => {
-      console.log("move piece was called");
       setGameState((prevState) => {
         if (prevState.gameStatus !== "playing" || !prevState.currentPiece) return prevState;
 

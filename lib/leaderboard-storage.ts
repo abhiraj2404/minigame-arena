@@ -33,10 +33,6 @@ export async function addScore(
     throw new Error("Invalid player name or score");
   }
 
-  console.log(
-    `Adding score: ${playerName}, ${score}, ${game}, ${walletAddress}`
-  );
-
   const { data: existingEntry, error } = await supabase
     .from("leaderboard")
     .select("*")

@@ -36,7 +36,6 @@ const TOTAL_MINES = 10;
 
 export default function MinesweeperPage() {
   const playerName = usePlayer().playerName as string;
-  console.log("playername from minesweeper page:", playerName);
   const [gameState, setGameState] = useState<GameState>({
     board: [],
     gameStatus: "waiting",

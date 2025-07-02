@@ -22,7 +22,7 @@ export async function getKeypairs(game: string) {
     .select("*")
     .eq("game", game)
     .single();
-  if (keypair) console.log("keypair: ", keypair);
+
   if (error) console.log("error fetching keypair: ", error);
 
   return keypair;
@@ -79,7 +79,7 @@ export async function getCurrentTournament(
       .eq("game", game)
       .maybeSingle();
 
-    if (tournament) console.log("current tournament fetched for: ", game);
+   
     if (error) console.log("error fetching current tournament: ", error);
 
     // If tournament exists but has ended, create a new one
@@ -112,7 +112,7 @@ export async function addEntryFee(game: string, amount: number): Promise<void> {
       .eq("id", tournament.id)
       .select();
 
-    if (data) console.log("added entry fee: ", data);
+  
     if (error) console.error("Error adding entry fee:", error);
   }
 }

@@ -24,9 +24,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("useEffect in player-context ran");
     const fetchOrRegisterPlayerName = async () => {
-      console.log("inside fetchOrRegisterPlayerName");
       if (!connected || !publicKey) {
         setPlayerName(null);
         return;
@@ -37,12 +35,10 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         // Try to fetch playerName
         let res = await fetch(`/api/user?walletAddress=${address}`);
         let data = await res.json();
-        console.log("data", data);
         if (res.ok && data.user.playerName) {
           setPlayerName(data.user.playerName);
         } else {
           // Generate random player name
-          console.log("generating random player name");
           let name = generatePlayerName();
           let regRes = await fetch("/api/user", {
             method: "POST",
