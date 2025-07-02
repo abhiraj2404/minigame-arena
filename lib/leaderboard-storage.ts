@@ -107,7 +107,7 @@ export async function addScore(
 
   // Calculate rank for this game
   const gameLeaderboard = (await getLeaderboard(game, 100)) || [];
-  const rank =
+  let rank =
     gameLeaderboard.findIndex(
       (entry) => entry.playerName === newEntry.playerName
     ) + 1;
@@ -151,8 +151,10 @@ export async function addScore(
     if (game === "minesweeper") {
       message =
         "You couldn't beat your previous best time, better luck next time!";
+      rank = 0;
     } else {
       message = "You couldn't beat your previous score, better luck next time!";
+      rank = 0;
     }
   }
 

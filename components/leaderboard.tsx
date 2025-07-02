@@ -2,10 +2,10 @@ import { formatSol, formatWalletAddress } from "@/lib/solana-config";
 import { LeaderboardEntry } from "@/lib/types";
 import { formatTimeAgo } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface LeaderboardProps {
   game: string;
-  setError: (error: string) => void;
   gameState: any;
   highScore: number;
   setHighScore: (score: number) => void;
@@ -23,7 +23,6 @@ const formatTime = (seconds: number) => {
 export default function Leaderboard({
   game,
   gameState,
-  setError,
   highScore,
   setHighScore,
   refreshTrigger,
@@ -52,7 +51,7 @@ export default function Leaderboard({
     } catch (error) {
       console.error("Failed to load leaderboard:", error);
       if (showLoading) {
-        setError("Failed to load leaderboard");
+        toast.error("Failed to load leaderboard");
       }
     } finally {
       if (showLoading) setLoading(false);

@@ -11,6 +11,8 @@ import Leaderboard from "@/components/leaderboard";
 import Tournament from "@/components/tournament";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { Spinner } from "@/components/ui/spinner";
+import { showConfetti } from "@/components/magicui/confetti";
+import { toast } from "sonner";
 
 interface Cell {
   isMine: boolean;
@@ -44,11 +46,10 @@ export default function MinesweeperPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string>("");
-  const [error, setError] = useState<string>("");
   const [gameTimer, setGameTimer] = useState<NodeJS.Timeout>();
   const [highScore, setHighScore] = useState<number>(0);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [showCelebrateButton, setShowCelebrateButton] = useState(false);
 
   const { publicKey } = useWallet();
   const [showPayment, setShowPayment] = useState(true);
@@ -79,9 +80,11 @@ export default function MinesweeperPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setMessage(data.message || "Win recorded!");
-
-        // Immediately refresh leaderboard
+        toast.success(data.message || "Win recorded!");
+        if (data.rank > 0 && data.rank <= 10) {
+          showConfetti();
+          setShowCelebrateButton(true);
+        }
         setTimeout(() => {
           triggerRefresh();
         }, 500);
@@ -91,7 +94,7 @@ export default function MinesweeperPage() {
       }
     } catch (error) {
       console.error("Failed to submit win:", error);
-      setError(`Failed to submit win: ${error instanceof Error ? error.message : "Unknown error"}`);
+      toast.error(`Failed to submit win: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setLoading(false);
       setLoadingOverlay({ isLoading: false, text: "" });
@@ -100,7 +103,7 @@ export default function MinesweeperPage() {
 
   // Handle payment success
   const handlePaymentSuccess = () => {
-    setMessage("Payment successful! You can now start the game.");
+    toast.success("Payment successful! You can now start the game.");
     setShowStartGameButton(true);
     setShowPayment(false);
     triggerRefresh();
@@ -117,7 +120,7 @@ export default function MinesweeperPage() {
 
   // Handle payment error
   const handlePaymentError = (errorMessage: string) => {
-    setError(errorMessage);
+    toast.error(errorMessage);
   };
 
   // Generate empty board
@@ -236,8 +239,6 @@ export default function MinesweeperPage() {
       totalWins: 0,
       currentGameTime: 0
     });
-    setMessage("");
-    setError("");
 
     // Start timer
     const startTime = Date.now();
@@ -452,8 +453,6 @@ export default function MinesweeperPage() {
       <div className="relative w-fit mx-auto text-center space-y-4">
         <h1 className="text-5xl font-bold text-white">💣 Minesweeper</h1>
         <p className="text-gray-300 text-lg">Clear the minefield and climb the leaderboard!</p>
-        {message && <div className="bg-green-900/50 border border-green-500/50 rounded-lg p-3 text-green-200">{message}</div>}
-        {error && <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3 text-red-200">{error}</div>}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -476,6 +475,11 @@ export default function MinesweeperPage() {
                 )}
               </div>
               <div className="flex gap-2">
+                {showCelebrateButton && (
+                  <ShimmerButton onClick={showConfetti}>
+                    Celebrate 🎉
+                  </ShimmerButton>
+                )}
                 {showPayment ? (
                   <div className="w-64">
                     <GamePayment game="minesweeper" onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
@@ -488,8 +492,6 @@ export default function MinesweeperPage() {
                   <ShimmerButton
                     onClick={() => {
                       setShowPayment(true);
-                      setMessage("");
-                      setError("");
                       setGameState({
                         board: [],
                         gameStatus: "waiting",
@@ -497,6 +499,7 @@ export default function MinesweeperPage() {
                         totalWins: 0,
                         currentGameTime: 0
                       });
+                      setShowCelebrateButton(false);
                     }}
                     disabled={loading}
                     className="text-sm"
@@ -563,12 +566,11 @@ export default function MinesweeperPage() {
         <div className="lg:col-span-1 space-y-6">
           {/* Tournament Info */}
 
-          <Tournament game="minesweeper" setError={setError} refreshTrigger={refreshTrigger} setLoadingOverlay={handleChildLoading} />
+          <Tournament game="minesweeper" refreshTrigger={refreshTrigger} setLoadingOverlay={handleChildLoading} />
 
           {/* Leaderboard */}
           <Leaderboard
             game="minesweeper"
-            setError={setError}
             gameState={gameState}
             highScore={highScore}
             setHighScore={setHighScore}

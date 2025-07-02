@@ -2,15 +2,15 @@ import { formatSol } from "@/lib/solana-config";
 import type { Tournament } from "@/lib/types";
 import { formatTimeAgo } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface TournamentProps {
   game: string;
-  setError: (error: string) => void;
   refreshTrigger: number;
   setLoadingOverlay: (isLoading: boolean, text: string) => void;
 }
 
-export default function Tournament({ game, setError, refreshTrigger, setLoadingOverlay }: TournamentProps) {
+export default function Tournament({ game, refreshTrigger, setLoadingOverlay }: TournamentProps) {
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<number>(0);
@@ -32,7 +32,7 @@ export default function Tournament({ game, setError, refreshTrigger, setLoadingO
     } catch (error) {
       console.error("Error loading tournament:", error);
       if (showLoading) {
-        setError("Failed to load tournament");
+        toast.error("Failed to load tournament");
       }
     } finally {
       if (showLoading) setLoading(false);

@@ -9,6 +9,8 @@ import Leaderboard from "@/components/leaderboard";
 import Tournament from "@/components/tournament";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { Spinner } from "@/components/ui/spinner";
+import { showConfetti } from "@/components/magicui/confetti";
+import { toast } from "sonner";
 
 interface Position {
   x: number;
@@ -39,10 +41,9 @@ export default function SnakePage() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string>("");
-  const [error, setError] = useState<string>("");
   const [highScore, setHighScore] = useState<number>(0);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [showCelebrateButton, setShowCelebrateButton] = useState(false);
 
   const { publicKey } = useWallet();
   const [showPayment, setShowPayment] = useState(true);
@@ -79,13 +80,14 @@ export default function SnakePage() {
 
       if (response.ok) {
         const data = await response.json();
-        setMessage(data.message || "Score submitted!");
-
-        // Immediately refresh leaderboard to show new score
+        toast.success(data.message || "Score submitted!");
+        if (data.rank > 0 && data.rank <= 10) {
+          showConfetti();
+          setShowCelebrateButton(true);
+        }
         setTimeout(() => {
           triggerRefresh();
         }, 500);
-
         console.log(`Score submitted successfully. Rank: #${data.rank}`);
       } else {
         const errorData = await response.json();
@@ -93,7 +95,7 @@ export default function SnakePage() {
       }
     } catch (error) {
       console.error("Failed to submit score:", error);
-      setError(`Failed to submit score: ${error instanceof Error ? error.message : "Unknown error"}`);
+      toast.error(`Failed to submit score: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setLoading(false);
       setLoadingOverlay({ isLoading: false, text: "" });
@@ -102,7 +104,7 @@ export default function SnakePage() {
 
   // Handle payment success
   const handlePaymentSuccess = () => {
-    setMessage("Payment successful! You can now start the game.");
+    toast.success("Payment successful! You can now start the game.");
     setShowPayment(false);
     triggerRefresh();
     setGameState((gamestate) => ({
@@ -117,7 +119,7 @@ export default function SnakePage() {
 
   // Handle payment error
   const handlePaymentError = (errorMessage: string) => {
-    setError(errorMessage);
+    toast.error(errorMessage);
   };
 
   // Generate random food position
@@ -202,8 +204,6 @@ export default function SnakePage() {
       gameStatus: "playing",
       score: 0
     });
-    setMessage("");
-    setError("");
     console.log(`New game started for player: ${playerName}`);
   };
 
@@ -333,7 +333,7 @@ export default function SnakePage() {
       case "ready":
         return "Start the game";
       case "playing":
-        return "Use arrow keys or WASD to move";
+        return "Use W A S D to move";
       case "paused":
         return "Game paused - Press SPACE to resume";
       case "gameOver":
@@ -378,11 +378,10 @@ export default function SnakePage() {
           </BlurFade>
         </div>
       )}
-      <div className="relative w-fit mx-auto text-center space-y-4">
-        <h1 className=" text-5xl font-bold w-fit mx-auto text-white">🐍 Snake</h1>
-        <p className=" text-gray-300 text-lg">Grow your snake and climb the leaderboard!</p>
-        {message && <div className="bg-green-900/50 border border-green-500/50 rounded-lg p-3 text-green-200">{message}</div>}
-        {error && <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3 text-red-200">{error}</div>}
+      <div className="text-center space-y-4">
+        <h1 className="relative text-5xl font-bold w-fit mx-auto text-white">🐍 Snake</h1>
+        <p className="relative w-fit mx-auto text-gray-300 text-lg">Grow your snake and climb the leaderboard!</p>
+        {/* Message and error popups are now handled by Sonner toast */}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -405,6 +404,11 @@ export default function SnakePage() {
                 )}
               </div>
               <div className="flex gap-2">
+                {showCelebrateButton && (
+                  <ShimmerButton onClick={showConfetti}>
+                    Celebrate 🎉
+                  </ShimmerButton>
+                )}
                 {showPayment ? (
                   <div className="w-64">
                     <GamePayment game="snake" onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
@@ -413,8 +417,6 @@ export default function SnakePage() {
                   <ShimmerButton
                     onClick={() => {
                       setShowPayment(true);
-                      setMessage("");
-                      setError("");
                       setGameState({
                         snake: INITIAL_SNAKE,
                         food: INITIAL_FOOD,
@@ -422,6 +424,7 @@ export default function SnakePage() {
                         gameStatus: "waiting",
                         score: 0
                       });
+                      setShowCelebrateButton(false);
                     }}
                     disabled={loading}
                     className="text-sm"
@@ -489,12 +492,11 @@ export default function SnakePage() {
         {/* Tournament & Leaderboard */}
         <div className="lg:col-span-1 space-y-6">
           {/* Tournament Info */}
-          <Tournament game="snake" setError={setError} refreshTrigger={refreshTrigger} setLoadingOverlay={handleChildLoading} />
+          <Tournament game="snake" refreshTrigger={refreshTrigger} setLoadingOverlay={handleChildLoading} />
 
           {/* Leaderboard */}
           <Leaderboard
             game="snake"
-            setError={setError}
             gameState={gameState}
             highScore={highScore}
             setHighScore={setHighScore}
