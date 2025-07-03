@@ -39,6 +39,7 @@ export default function SnakePage() {
     gameStatus: "waiting",
     score: 0
   });
+  console.log("player name from snake page", playerName);
 
   const [loading, setLoading] = useState(false);
   const [highScore, setHighScore] = useState<number>(0);
@@ -53,18 +54,24 @@ export default function SnakePage() {
 
   const [loadingOverlay, setLoadingOverlay] = useState({ isLoading: true, text: "" });
 
+  const playerNameRef = useRef(playerName);
+  useEffect(() => {
+    playerNameRef.current = playerName;
+  }, [playerName]);
+
   const triggerRefresh = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
 
   // Submit score to backend and update leaderboard
-  const submitScore = async (score: number, playerName: string) => {
+  const submitScore = async (score: number) => {
+    const currentPlayerName = playerNameRef.current;
     if (score === 0) return; // Don't submit zero scores
 
     try {
       setLoading(true);
       setLoadingOverlay({ isLoading: true, text: "Submitting" });
-      console.log(`Submitting score: ${playerName} - ${score}`);
+      console.log(`Submitting score: ${currentPlayerName} - ${score}`);
 
       const response = await fetch("/api/snake/score", {
         method: "POST",
@@ -72,7 +79,7 @@ export default function SnakePage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          playerName,
+          playerName: currentPlayerName,
           score,
           walletAddress: publicKey ? publicKey.toString() : undefined
         })
@@ -149,7 +156,7 @@ export default function SnakePage() {
       // Check wall collision
       if (head.x < 0 || head.x >= BOARD_SIZE || head.y < 0 || head.y >= BOARD_SIZE) {
         // Game over
-        submitScore(prevState.score, playerName);
+        submitScore(prevState.score);
         return {
           ...prevState,
           gameStatus: "gameOver"
@@ -160,7 +167,7 @@ export default function SnakePage() {
       if (newSnake.some((segment) => segment.x === head.x && segment.y === head.y)) {
         // Game over
         console.log(`Game over - self collision. Final score: ${prevState.score}`);
-        submitScore(prevState.score, playerName);
+        submitScore(prevState.score);
         return {
           ...prevState,
           gameStatus: "gameOver"
@@ -403,11 +410,7 @@ export default function SnakePage() {
                 )}
               </div>
               <div className="flex gap-2">
-                {showCelebrateButton && (
-                  <ShimmerButton onClick={showConfetti}>
-                    Celebrate 🎉
-                  </ShimmerButton>
-                )}
+                {showCelebrateButton && <ShimmerButton onClick={showConfetti}>Celebrate 🎉</ShimmerButton>}
                 {showPayment ? (
                   <div className="w-64">
                     <GamePayment game="snake" onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />

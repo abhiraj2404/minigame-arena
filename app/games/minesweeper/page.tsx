@@ -56,12 +56,17 @@ export default function MinesweeperPage() {
 
   const [loadingOverlay, setLoadingOverlay] = useState({ isLoading: false, text: "" });
 
+  const playerNameRef = useRef(playerName);
+  useEffect(() => {
+    playerNameRef.current = playerName;
+  }, [playerName]);
+
   const triggerRefresh = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
 
   // Submit win to backend
-  const submitWin = async (playerName: string, timeTaken: number) => {
+  const submitWin = async (timeTaken: number) => {
     try {
       setLoading(true);
       setLoadingOverlay({ isLoading: true, text: "Submitting" });
@@ -71,7 +76,7 @@ export default function MinesweeperPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          playerName,
+          playerName: playerNameRef.current,
           time: timeTaken,
           walletAddress: publicKey ? publicKey.toString() : undefined
         })
@@ -298,7 +303,7 @@ export default function MinesweeperPage() {
         }
 
         // Submit win to backend (score = time taken)
-        submitWin(playerName, prevState.currentGameTime + 1); // +1 to include the last second
+        submitWin(prevState.currentGameTime + 1); // +1 to include the last second
 
         return {
           ...prevState,
@@ -474,11 +479,7 @@ export default function MinesweeperPage() {
                 )}
               </div>
               <div className="flex gap-2">
-                {showCelebrateButton && (
-                  <ShimmerButton onClick={showConfetti}>
-                    Celebrate 🎉
-                  </ShimmerButton>
-                )}
+                {showCelebrateButton && <ShimmerButton onClick={showConfetti}>Celebrate 🎉</ShimmerButton>}
                 {showPayment ? (
                   <div className="w-64">
                     <GamePayment game="minesweeper" onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />

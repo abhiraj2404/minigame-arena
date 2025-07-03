@@ -122,18 +122,24 @@ export default function TetrisPage() {
 
   const [loadingOverlay, setLoadingOverlay] = useState({ isLoading: true, text: "" });
 
+  const playerNameRef = useRef(playerName);
+  useEffect(() => {
+    playerNameRef.current = playerName;
+  }, [playerName]);
+
   const triggerRefresh = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
 
   // Submit score to backend with wallet address
-  const submitScore = async (score: number, playerName: string) => {
+  const submitScore = async (score: number) => {
     if (score === 0) return; // Don't submit zero scores
 
     try {
       setLoading(true);
       setLoadingOverlay({ isLoading: true, text: "Submitting" });
-      console.log(`Submitting Tetris score: ${playerName} - ${score}`);
+      const currentPlayerName = playerNameRef.current;
+      console.log(`Submitting Tetris score: ${currentPlayerName} - ${score}`);
 
       const response = await fetch("/api/tetris/score", {
         method: "POST",
@@ -141,7 +147,7 @@ export default function TetrisPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          playerName,
+          playerName: currentPlayerName,
           score,
           walletAddress: publicKey ? publicKey.toString() : undefined
         })
@@ -357,7 +363,7 @@ export default function TetrisPage() {
             // Check game over
             if (nextCurrentPiece && !canPlacePiece(nextCurrentPiece, clearedBoard)) {
               // Game over
-              submitScore(newScore, playerName);
+              submitScore(newScore);
               return {
                 ...prevState,
                 board: clearedBoard,
