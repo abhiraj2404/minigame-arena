@@ -19,7 +19,7 @@ export default function Navbar() {
   const { playerName, loading: playerNameLoading } = usePlayer();
 
   return (
-    <nav className="relative z-100 border-b mx-6 border-white/10 bg-black/50 backdrop-blur-xl">
+    <nav className="relative z-100 border-b sm:mx-6 border-white/10 bg-black/50 backdrop-blur-xl">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-white hover:text-green-400 transition-colors">
@@ -68,7 +68,8 @@ export default function Navbar() {
               </MagicCard>
             )}
 
-            <div className="relative group flex items-center">
+            {/* Hide Solana Devnet and Faucet on small screens */}
+            <div className="relative group items-center hidden sm:flex">
               <Button
                 variant="secondary"
                 size="sm"
@@ -97,7 +98,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center space-x-5">
+            <div className="items-center justify-center space-x-5 hidden sm:flex">
               <WalletMultiButton className="bg-black text-4xl" />
             </div>
             <Link
